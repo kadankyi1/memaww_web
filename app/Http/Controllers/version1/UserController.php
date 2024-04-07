@@ -6,7 +6,9 @@ namespace App\Http\Controllers\version1;
 use App\Models\version1\User;
 use App\Http\Controllers\Controller;
 use App\Models\version1\Country;
+use App\Models\version1\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 
 ini_set('memory_limit','1024M');
@@ -118,5 +120,64 @@ class UserController extends Controller
         ]);
 
     }
+
+    public function requestCollection(Request $request){
+        if (!Auth::guard('api')->check() || !$request->user()->tokenCan("use-mobile-apps-as-normal-user")) {
+            return response(["status" => "fail", "message" => "Permission Denied. Please log out and login again"]);
+        }
+
+        if (auth()->user()->user_flagged) {
+            $request->user()->token()->revoke();
+            return response(["status" => "fail", "message" => "Account access restricted"]);
+        }
+    
+        $validatedData = $request->validate([
+            "collect_loc_raw" => "bail|required|max:100",
+            "collect_loc_gps" => "bail|max:20",
+            "collect_datetime" => "bail|required|date_format:Y-m-d H:i:s",
+            "contact_person_phone" => "bail|required|max:10",
+            "drop_loc_raw" => "bail|max:100",
+            "drop_loc_gps" => "bail|max:20",
+            "drop_datetime" => "bail|max:12",
+            "smallitems_justwash_quantity" => "bail|required|integer|digits_between:-1,1000",
+            "smallitems_washandiron_quantity" => "bail|required|integer|digits_between:-1,1000",
+            "bigitems_justwash_quantity" => "bail|required|integer|digits_between:1,1000",
+            "bigitems_washandiron_quantity" => "bail|required|integer|digits_between:-1,1000",
+            "app_type" => "bail|required|max:8",
+            "app_version_code" => "bail|required|integer"
+        ]);
+        
+        $orderData["order_sys_id"] = auth()->user()->user_id . "_" . date("YmdHis") . UtilController::getRandomString(4);
+        $orderData["order_user_id"] = auth()->user()->user_id;
+        $orderData["order_laundrysp_id"] = 1; // MeMaww Ghana
+        //$orderData["order_collection_biker_name"] = "";
+        $orderData["order_collection_location_raw"] = $validatedData["collect_loc_raw"];
+        $orderData["order_collection_location_gps"] = $validatedData["collect_loc_gps"];
+        $orderData["order_collection_date"] = $validatedData["collect_datetime"];
+        $orderData["order_collection_contact_person_phone"] = $validatedData["contact_person_phone"];
+        $orderData["order_dropoff_location_raw"] = $validatedData["collect_loc_raw"];
+        $orderData["order_dropoff_location_gps"] = $validatedData["collect_loc_gps"];
+        $orderData["order_dropoff_date"] = $validatedData["drop_datetime"];
+        $orderData["order_dropoff_contact_person_phone"] = $validatedData["contact_person_phone"];
+        //$orderData["order_dropoff_biker_name"] = "";
+        $orderData["order_lightweightitems_just_wash_quantity"] = $validatedData["smallitems_justwash_quantity"];
+        $orderData["order_lightweightitems_wash_and_iron_quantity"] = $validatedData["smallitems_washandiron_quantity"];
+        $orderData["order_bulkyitems_just_wash_quantity"] = $validatedData["bigitems_justwash_quantity"];
+        $orderData["order_bulkyitems_wash_and_iron_quantity"] = $validatedData["bigitems_washandiron_quantity"];
+        $orderData["order_being_worked_on_status"] = 0; //0-pending, 1-asignedForCollection, 2-Collected, 3-Washing, 4-assignedForDelivery, 5-completed
+        $orderData["order_payment_status"] = 0; //0-pending, 1-paid-to-biker, 2-momo
+        $orderData["order_payment_details"] = "";
+        $orderData["order_flagged"] = false;
+        $orderData["order_flagged_reason"] = "";
+        $order = Order::create($orderData);
+    
+    
+        return response([
+            "status" => "success", 
+            "message" => "Order created"
+        ]);
+    
+    }
+    
 
 }

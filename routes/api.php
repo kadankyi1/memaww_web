@@ -11,3 +11,6 @@ Route::get('/user', function (Request $request) {
 
 // LOGIN
 Route::post('/v1/user/sign-in',[App\Http\Controllers\version1\UserController::class, 'enterApp']);
+
+// PLACE ORDER
+Route::middleware('auth:api')->post('/v1/user/request-collection', [App\Http\Controllers\version1\UserController::class, 'requestCollection']);
