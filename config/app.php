@@ -8,6 +8,9 @@ return [
     |
     */
 
+    // SUPPORT EMAIL
+    'supportemail' => env('SUPPORT_EMAIL', 'support@memaww.com'),
+
     // ANDROID APP MINIMUM VERSION ALLOWED
     'androidminvc' => env('ANDROID_MIN_ALLOWED_VERSION_CODE', '1'),
 

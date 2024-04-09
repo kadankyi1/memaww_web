@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\Models\version1\Order;
 
 class User extends Authenticatable
 {    
@@ -60,5 +61,10 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function userOrders(){
+        return $this->hasMany(Order::class, 'order_user_id');
+    }
+
 
 }

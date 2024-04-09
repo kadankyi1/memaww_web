@@ -3,6 +3,7 @@
 namespace App\Models\version1;
 
 use Laravel\Passport\HasApiTokens;
+use App\Models\version1\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
@@ -51,23 +52,13 @@ class Order extends Model
         'updated_at',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    public function orderDetails(){
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
+        //customer_id is a foreign key in customer_items table
+   
+        return $this->hasOne(User::class, 'user_id');
+   
+                   //An Item will has single detail thats why hasOne relation used here
+    }
 
 }

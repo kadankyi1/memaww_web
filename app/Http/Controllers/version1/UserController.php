@@ -5,6 +5,10 @@ namespace App\Http\Controllers\version1;
 
 use App\Models\version1\User;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\version1\RequestCollectionCallbackMailToAdmin;
+use App\Models\version1\CollectionCallBack;
+use App\Models\version1\CollectionCallBackRequest;
 use App\Models\version1\Country;
 use App\Models\version1\Order;
 use Illuminate\Http\Request;
@@ -179,5 +183,113 @@ class UserController extends Controller
     
     }
     
+
+    public function requestCollectionCallBack(Request $request){
+        if (!Auth::guard('api')->check() || !$request->user()->tokenCan("use-mobile-apps-as-normal-user")) {
+            return response(["status" => "fail", "message" => "Permission Denied. Please log out and login again"]);
+        }
+
+        if (auth()->user()->user_flagged) {
+            $request->user()->token()->revoke();
+            return response(["status" => "fail", "message" => "Account access restricted"]);
+        }
+    
+        $validatedData = $request->validate([
+            "app_type" => "bail|required|max:8",
+            "app_version_code" => "bail|required|integer"
+        ]);
+
+        
+
+        $collectionRequestData["col_callback_req_user_id"] = auth()->user()->user_id;
+        $collectionRequestData["col_callback_req_status"] = 0;
+        $collectionRequestData["col_callback_req_status_message"] = "User not called";
+        $order = CollectionCallBackRequest::create($collectionRequestData);
+    
+        $email_data = array(
+            'message_text' => 'This user has requested a laundry collection request from the MeMaww Team',
+            'user_name' => auth()->user()->user_first_name . " " . auth()->user()->user_last_name,
+            'user_phone' => auth()->user()->user_phone,
+            'time' => date("F j, Y, g:i a")
+        );
+        Mail::to(config('app.supportemail'))->send(new RequestCollectionCallbackMailToAdmin($email_data));
+
+        return response([
+            "status" => "success", 
+            "message" => "Callback request order created"
+        ]);
+    
+    }
+    
+
+    public function getMyOrdersListing(Request $request)
+    {
+        if (!Auth::guard('api')->check() || !$request->user()->tokenCan("use-mobile-apps-as-normal-user")) {
+            return response(["status" => "fail", "message" => "Permission Denied. Please log out and login again"]);
+        }
+
+        if (auth()->user()->user_flagged) {
+            $request->user()->token()->revoke();
+            return response(["status" => "fail", "message" => "Account access restricted"]);
+        }
+    
+
+        // MAKING SURE THE INPUT HAS THE EXPECTED VALUES
+        $validatedData = $request->validate([
+            "app_type" => "bail|required|max:8",
+            "app_version_code" => "bail|required|integer"
+        ]);
+    
+        //$result = StockOwnership::where("user_id", auth()->user()->user_id)->Where('stockownership_stocks_quantity', '>', 0)->get();
+        //$customer_item_detail_data = User::with('userOrders')->where("user_id", auth()->user()->user_id)->orderBy('order_id','desc')->get();
+
+        $customer_item_detail_data = Order::with('orderDetails')->where("order_user_id", auth()->user()->user_id)->orderBy('order_id','desc')->get();
+    
+        /*
+        $found_transactions = DB::table('transactions')
+        ->select('transactions.transaction_referenced_item_id')
+        ->where($where_array)
+        ->orderBy('created_at', 'desc')
+        //->take(100)
+        ->get();
+
+        $found_books = array();
+        for ($i=0; $i < count($found_transactions); $i++) { 
+
+            $where_array2 = array(
+                ['books.book_sys_id', '=', $found_transactions[$i]->transaction_referenced_item_id],
+                ['books.booksummary_flagged', '=', 0]
+            ); 
+            
+            $this_book = DB::table('books')
+            ->select('books.book_id', 'books.book_cover_photo', 'books.book_sys_id', 'books.book_title', 'books.book_author', 'books.book_ratings', 'books.book_description_short', 'books.book_description_long', 'books.book_pages', 'books.book_pdf', 'books.book_summary_pdf', 'books.book_audio', 'books.book_summary_audio', 'books.book_cost_usd', 'books.book_summary_cost_usd', 'books.bookfull_flagged', 'books.booksummary_flagged')
+            ->where($where_array2)
+            ->orderBy('created_at', 'desc')
+            //->take(100)
+            ->get();
+            
+    
+            if(!empty($this_book[0]->book_sys_id)){
+                if(!empty($this_book[0]->book_cover_photo) && file_exists(public_path() . "/uploads/books_cover_arts/" . $this_book[0]->book_cover_photo)){
+                    $this_book[0]->book_cover_photo = config('app.books_cover_arts_folder') . "/" . $this_book[0]->book_cover_photo;
+                } else {
+                    $this_book[0]->book_cover_photo = config('app.books_cover_arts_folder') . "/sample_cover_art.jpg";
+                }
+                $this_book[0]->book_reference_url = config('app.url') . "/buy?ref=" . $this_book[0]->book_sys_id;
+
+                array_push($found_books, $this_book[0]);
+            }
+
+        }
+    */
+
+        return response([
+            "status" => "success", 
+            "message" => "Operation successful", 
+            "data" => $customer_item_detail_data
+        ]);
+    }
+
+
 
 }
