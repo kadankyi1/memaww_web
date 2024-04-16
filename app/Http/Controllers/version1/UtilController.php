@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\version1;
 
+use DateTime;
 use App\Http\Controllers\Controller;
 use App\Models\version1\Plans;
 use App\Models\version1\Transaction;
@@ -35,6 +36,31 @@ class UtilController extends Controller
 	}
     
 
+    public static function getTimePassed($first, $second)
+    {
+        $first  = new DateTime( $first );
+        $second = new DateTime( $second );
+        
+        $diff = $first->diff( $second );
+        
+        return $diff->format( '%I' );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    |--------------------------------------------------------------------------
+    | THIS FUNCTION REFORMATS THE DATE
+    |--------------------------------------------------------------------------
+    |--------------------------------------------------------------------------
+    */
+
+
+    public static function reformatDate($input_date, $needed_format)
+    {
+        return date($needed_format, strtotime($input_date));
+
+    }
     /*
     |--------------------------------------------------------------------------
     |--------------------------------------------------------------------------

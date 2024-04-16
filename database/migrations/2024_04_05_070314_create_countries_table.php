@@ -21,7 +21,10 @@ class CreateCountriesTable extends Migration
             $table->string('country_iso_3char_name', 255)->nullable();
             $table->string('country_name_num_code', 255)->nullable();
             $table->string('country_phone_num_code', 255)->nullable();
-            $table->boolean('country_can_get_offers')->default(false);;
+            $table->boolean('country_can_get_offers')->default(false);
+            $table->string('country_currency_symbol', 255)->nullable();
+            $table->string('country_currency_threeletter', 255)->nullable();
+            $table->string('country_currency_fullnamename', 255)->nullable();
             $table->boolean('country_can_trade')->default(false);;
             $table->timestamps();
         });

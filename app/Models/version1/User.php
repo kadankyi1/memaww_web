@@ -32,6 +32,8 @@ class User extends Authenticatable
         'user_last_name',
         'user_phone',
         'user_country_id',
+        'user_referral_code',
+        'user_invitors_referral_code',
         'user_notification_token_android',
         'user_notification_token_web',
         'user_notification_token_ios',
@@ -65,6 +67,12 @@ class User extends Authenticatable
     public function userOrders(){
         return $this->hasMany(Order::class, 'order_user_id');
     }
+
+
+    public function userCountry(){
+        return $this->hasOne(Country::class, 'country_id', 'user_country_id');
+    }
+
 
 
 }

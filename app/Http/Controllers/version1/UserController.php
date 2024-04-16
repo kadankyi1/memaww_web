@@ -5,11 +5,14 @@ namespace App\Http\Controllers\version1;
 
 use App\Models\version1\User;
 use App\Http\Controllers\Controller;
+use App\Mail\version1\GeneralMailToAdmin;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\version1\RequestCollectionCallbackMailToAdmin;
 use App\Models\version1\CollectionCallBack;
 use App\Models\version1\CollectionCallBackRequest;
 use App\Models\version1\Country;
+use App\Models\version1\Discount;
+use App\Models\version1\Message;
 use App\Models\version1\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -40,6 +43,7 @@ class UserController extends Controller
             "user_phone" => "bail|required|max:10",
             "user_first_name" => "bail|required|max:100",
             "user_last_name" => "bail|required|max:100",
+            "invite_code" => "bail|max:15",
             "app_type" => "bail|required|max:8",
             "app_version_code" => "bail|required|integer"
         ]);
@@ -101,6 +105,8 @@ class UserController extends Controller
             $userData["user_last_name"] = $request->user_last_name;
             $userData["user_phone"] = $user_phone_correct;
             $userData["user_country_id"] = $user_country->country_id;
+            $userData["user_referral_code"] = substr(uniqid(),-10);
+            $userData["user_invitors_referral_code"] = $request->invite_code;
             $userData["user_notification_token_android"] = "";
             $userData["user_notification_token_web"] = "";
             $userData["user_notification_token_ios"] = "";
@@ -115,7 +121,10 @@ class UserController extends Controller
             $user1 = User::create($userData);
         }
 
+        $user1 = User::with('userCountry')->where("user_id", $user1->user_id)->latest()->first();
+
         $accessToken = $user1->createToken("authToken", ["use-mobile-apps-as-normal-user"])->accessToken;
+
         return response([
             "status" => "success", 
             "message" => "Sign-in successful",
@@ -124,6 +133,14 @@ class UserController extends Controller
         ]);
 
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    |--------------------------------------------------------------------------
+    | THIS FUNCTION GETS THE PRICE AND RECORDS AN ORDER PENDING USER-CONFIRMATION
+    |--------------------------------------------------------------------------
+    |--------------------------------------------------------------------------
+    */
 
     public function requestCollection(Request $request){
         if (!Auth::guard('api')->check() || !$request->user()->tokenCan("use-mobile-apps-as-normal-user")) {
@@ -138,51 +155,187 @@ class UserController extends Controller
         $validatedData = $request->validate([
             "collect_loc_raw" => "bail|required|max:100",
             "collect_loc_gps" => "bail|max:20",
-            "collect_datetime" => "bail|required|date_format:Y-m-d H:i:s",
+            "collect_datetime" => "bail|required|date_format:H:i",
             "contact_person_phone" => "bail|required|max:10",
             "drop_loc_raw" => "bail|max:100",
             "drop_loc_gps" => "bail|max:20",
             "drop_datetime" => "bail|max:12",
             "smallitems_justwash_quantity" => "bail|required|integer|digits_between:-1,1000",
             "smallitems_washandiron_quantity" => "bail|required|integer|digits_between:-1,1000",
-            "bigitems_justwash_quantity" => "bail|required|integer|digits_between:1,1000",
+            "smallitems_justiron_quantity" => "bail|required|integer|digits_between:-1,1000",
+            "bigitems_justwash_quantity" => "bail|required|integer|digits_between:-1,1000",
             "bigitems_washandiron_quantity" => "bail|required|integer|digits_between:-1,1000",
+            "discount_code" => "bail|max:12",
             "app_type" => "bail|required|max:8",
             "app_version_code" => "bail|required|integer"
         ]);
         
+        $final_price = 0;
+        $pay_online = "yes";
+        $pay_on_pickup = "yes";
+        $discount_percentage = 0;
+        $discount_amount = 0;
+        $discount_amount_usd = 0;
+        $discount_id= null;
+        $original_price = 0;
+
+
+        $userCountry = Country::where("country_id", auth()->user()->user_country_id)->latest()->first();
+        if(!empty($userCountry->country_currency_symbol)){
+            return response([
+                "status" => "error", 
+                "message" => "A currency error occurred."
+            ]);
+        }
+
+        if(auth()->user()->user_country_id == 81) { // GHANA
+
+            // LIGHT WEIGHT ITEMS --- WASH AND FOLD
+            if($request->smallitems_justwash_quantity < 10 && $request->smallitems_justwash_quantity > 0){
+                $final_price = $final_price + 70;
+            } else if($request->smallitems_justwash_quantity >= 10 && $request->smallitems_justwash_quantity < 15){
+                $final_price = $final_price + ($request->smallitems_justwash_quantity * 7);
+            } else {
+                $final_price = $final_price + ($request->smallitems_justwash_quantity * 5);
+            }
+
+            // LIGHT WEIGHT ITEMS --- WASH AND IRON
+            if($request->smallitems_washandiron_quantity < 10 && $request->smallitems_washandiron_quantity > 0 && $final_price < 70){
+                $final_price = $final_price + 100;
+            } else if($request->smallitems_washandiron_quantity >= 10 && $request->smallitems_washandiron_quantity < 15 && $final_price < 70){
+                $final_price = $final_price + ($request->smallitems_washandiron_quantity * 10);
+            } else {
+                $final_price = $final_price + ($request->smallitems_washandiron_quantity * 8);
+            }
+
+            // LIGHT WEIGHT ITEMS --- JUST IRON
+            if($request->smallitems_justiron_quantity < 10 && $request->smallitems_justiron_quantity > 0 && $final_price < 70){
+                $final_price = $final_price + 70;
+            } else if($request->smallitems_justiron_quantity >= 10 && $request->smallitems_justiron_quantity < 15 && $final_price < 70){
+                $final_price = $final_price + ($request->smallitems_justiron_quantity * 6);
+            } else {
+                $final_price = $final_price + ($request->smallitems_justiron_quantity * 5);
+            }
+            
+            // BULKY ITEMS --- WASH AND FOLD
+            if($request->bigitems_justwash_quantity == 1 && $final_price < 70){
+                $final_price = $final_price + 70;
+            } else if($request->bigitems_justwash_quantity >= 2 && $request->bigitems_justwash_quantity < 5 && $final_price < 70){
+                $final_price = $final_price + ($request->bigitems_justwash_quantity * 35);
+            } else {
+                $final_price = $final_price + ($request->bigitems_justwash_quantity * 25);
+            }
+            
+            // BULKY ITEMS --- WASH AND IRON
+            if($request->bigitems_washandiron_quantity == 1 && $final_price < 70){
+                $final_price = $final_price + 80;
+            } else if($request->bigitems_washandiron_quantity >= 2 && $request->bigitems_washandiron_quantity < 5 && $final_price < 70){
+                $final_price = $final_price + ($request->bigitems_washandiron_quantity * 40);
+            } else {
+                $final_price = $final_price + ($request->bigitems_washandiron_quantity * 30);
+            }
+
+            $original_price = $final_price;
+            
+            if(!empty($request->discount_code) && $final_price > 0){
+                $discount = Discount::where('discount_code', '=', $request->discount_code)->first();
+                if(!empty($discount->discount_percentage) && $discount->discount_percentage > 0 && (empty($discount->discount_restricted_to_user_id) || ($discount->discount_restricted_to_user_id == auth()->user()->user_id))){
+                    $discount_id = $discount->discount_id;
+                    $discount_percentage =  $discount->discount_percentage;
+                    $discount_amount = $final_price * (($discount->discount_percentage)/100);
+                    $discount_amount_usd = $discount_amount/config('app.one_dollar_to_one_ghana_cedi');
+                    $final_price =  $final_price * ((100-$discount->discount_percentage)/100);
+                }
+            }
+
+            $final_price = strval($final_price);
+            $user_currency = "cedis";
+            
+        } else {
+            return response([
+                "status" => "error", 
+                "message" => "Service not available in your country."
+            ]);
+        }
         $orderData["order_sys_id"] = auth()->user()->user_id . "_" . date("YmdHis") . UtilController::getRandomString(4);
         $orderData["order_user_id"] = auth()->user()->user_id;
         $orderData["order_laundrysp_id"] = 1; // MeMaww Ghana
         //$orderData["order_collection_biker_name"] = "";
         $orderData["order_collection_location_raw"] = $validatedData["collect_loc_raw"];
         $orderData["order_collection_location_gps"] = $validatedData["collect_loc_gps"];
-        $orderData["order_collection_date"] = $validatedData["collect_datetime"];
+        $orderData["order_collection_date"] = date("Y-m-d") . " " . $validatedData["collect_datetime"];
         $orderData["order_collection_contact_person_phone"] = $validatedData["contact_person_phone"];
         $orderData["order_dropoff_location_raw"] = $validatedData["collect_loc_raw"];
         $orderData["order_dropoff_location_gps"] = $validatedData["collect_loc_gps"];
         $orderData["order_dropoff_date"] = $validatedData["drop_datetime"];
         $orderData["order_dropoff_contact_person_phone"] = $validatedData["contact_person_phone"];
+
+        $orderData["order_country_id"] = auth()->user()->user_country_id;
+        $orderData["order_user_countrys_currency"] = $validatedData["contact_person_phone"];
+        $orderData["order_discount_id"] = $discount_id;
+        $orderData["order_discount_amount_in_user_countrys_currency"] = $discount_amount;
+        $orderData["order_discount_amount_in_dollars_at_the_time"] = $discount_amount_usd;
+        $orderData["order_final_price_in_user_countrys_currency"] = $final_price;
+        $orderData["order_final_price_in_dollars_at_the_time"] = $final_price/config('app.one_dollar_to_one_ghana_cedi');
+
         //$orderData["order_dropoff_biker_name"] = "";
         $orderData["order_lightweightitems_just_wash_quantity"] = $validatedData["smallitems_justwash_quantity"];
         $orderData["order_lightweightitems_wash_and_iron_quantity"] = $validatedData["smallitems_washandiron_quantity"];
         $orderData["order_bulkyitems_just_wash_quantity"] = $validatedData["bigitems_justwash_quantity"];
         $orderData["order_bulkyitems_wash_and_iron_quantity"] = $validatedData["bigitems_washandiron_quantity"];
-        $orderData["order_being_worked_on_status"] = 0; //0-pending, 1-asignedForCollection, 2-Collected, 3-Washing, 4-assignedForDelivery, 5-completed
+        $orderData["order_status"] = 0; //0=pending_user_confirmation, 1=pending_payment, 2-payment_made_pending_collector_assignment, 3-Collected, 4-Washing, 5-assigned_for_delivery, 6-completed
         $orderData["order_payment_status"] = 0; //0-pending, 1-paid-to-biker, 2-momo
         $orderData["order_payment_details"] = "";
         $orderData["order_flagged"] = false;
         $orderData["order_flagged_reason"] = "";
         $order = Order::create($orderData);
-    
-    
+        
         return response([
             "status" => "success", 
+            "pay_online" => $pay_online, 
+            "pay_on_pickup" => $pay_on_pickup, 
+            "original_price" => $userCountry->country_currency_symbol . strval($original_price), 
+            "discount_percentage" => $userCountry->country_currency_symbol . strval($discount_percentage), 
+            "discount_amount" => $userCountry->country_currency_symbol . strval($discount_amount), 
+            "price_final" => $userCountry->country_currency_symbol . strval($final_price), 
             "message" => "Order created"
         ]);
     
     }
     
+
+    public function confirmCollectionRequestOrder(Request $request){
+
+        if (!Auth::guard('api')->check() || !$request->user()->tokenCan("use-mobile-apps-as-normal-user")) {
+            return response(["status" => "fail", "message" => "Permission Denied. Please log out and login again"]);
+        }
+
+        if (auth()->user()->user_flagged) {
+            $request->user()->token()->revoke();
+            return response(["status" => "fail", "message" => "Account access restricted"]);
+        }
+    
+        $validatedData = $request->validate([
+            "collect_loc_raw" => "bail|required|max:100",
+            "collect_loc_gps" => "bail|max:20",
+            "collect_datetime" => "bail|required|date_format:H:i",
+            "contact_person_phone" => "bail|required|max:10",
+            "drop_loc_raw" => "bail|max:100",
+            "drop_loc_gps" => "bail|max:20",
+            "drop_datetime" => "bail|max:12",
+            "smallitems_justwash_quantity" => "bail|required|integer|digits_between:-1,1000",
+            "smallitems_washandiron_quantity" => "bail|required|integer|digits_between:-1,1000",
+            "smallitems_justiron_quantity" => "bail|required|integer|digits_between:-1,1000",
+            "bigitems_justwash_quantity" => "bail|required|integer|digits_between:-1,1000",
+            "bigitems_washandiron_quantity" => "bail|required|integer|digits_between:-1,1000",
+            "discount_code" => "bail|max:12",
+            "app_type" => "bail|required|max:8",
+            "app_version_code" => "bail|required|integer"
+        ]);
+        
+        // REMEMBER TO GIVE REFERROR'S THEIR DISCOUNT AS A MESSAGE AND NOTIFICATION
+        // WHEN THEIR INVITEES PLACE THEIR FIRST ORDER
+    }
 
     public function requestCollectionCallBack(Request $request){
         if (!Auth::guard('api')->check() || !$request->user()->tokenCan("use-mobile-apps-as-normal-user")) {
@@ -199,7 +352,15 @@ class UserController extends Controller
             "app_version_code" => "bail|required|integer"
         ]);
 
-        
+        $latest_callback_req = CollectionCallBackRequest::where("col_callback_req_user_id", auth()->user()->user_id)->orderBy('col_callback_req_id', 'DESC')->first();;
+
+        if(!empty($latest_callback_req->created_at)){
+            intval(UtilController::getTimePassed(date("Y-m-d h:i:sa"), $latest_callback_req->created_at)) < 30;
+            return response([
+                "status" => "success", 
+                "message" => "Your previous callback request is in the works. You should receive a callback shortly"
+            ]);
+        }
 
         $collectionRequestData["col_callback_req_user_id"] = auth()->user()->user_id;
         $collectionRequestData["col_callback_req_status"] = 0;
@@ -216,7 +377,7 @@ class UserController extends Controller
 
         return response([
             "status" => "success", 
-            "message" => "Callback request order created"
+            "message" => "We will call you shortly to take your order. Thank you."
         ]);
     
     }
@@ -240,48 +401,7 @@ class UserController extends Controller
             "app_version_code" => "bail|required|integer"
         ]);
     
-        //$result = StockOwnership::where("user_id", auth()->user()->user_id)->Where('stockownership_stocks_quantity', '>', 0)->get();
-        //$customer_item_detail_data = User::with('userOrders')->where("user_id", auth()->user()->user_id)->orderBy('order_id','desc')->get();
-
-        $customer_item_detail_data = Order::with('orderDetails')->where("order_user_id", auth()->user()->user_id)->orderBy('order_id','desc')->get();
-    
-        /*
-        $found_transactions = DB::table('transactions')
-        ->select('transactions.transaction_referenced_item_id')
-        ->where($where_array)
-        ->orderBy('created_at', 'desc')
-        //->take(100)
-        ->get();
-
-        $found_books = array();
-        for ($i=0; $i < count($found_transactions); $i++) { 
-
-            $where_array2 = array(
-                ['books.book_sys_id', '=', $found_transactions[$i]->transaction_referenced_item_id],
-                ['books.booksummary_flagged', '=', 0]
-            ); 
-            
-            $this_book = DB::table('books')
-            ->select('books.book_id', 'books.book_cover_photo', 'books.book_sys_id', 'books.book_title', 'books.book_author', 'books.book_ratings', 'books.book_description_short', 'books.book_description_long', 'books.book_pages', 'books.book_pdf', 'books.book_summary_pdf', 'books.book_audio', 'books.book_summary_audio', 'books.book_cost_usd', 'books.book_summary_cost_usd', 'books.bookfull_flagged', 'books.booksummary_flagged')
-            ->where($where_array2)
-            ->orderBy('created_at', 'desc')
-            //->take(100)
-            ->get();
-            
-    
-            if(!empty($this_book[0]->book_sys_id)){
-                if(!empty($this_book[0]->book_cover_photo) && file_exists(public_path() . "/uploads/books_cover_arts/" . $this_book[0]->book_cover_photo)){
-                    $this_book[0]->book_cover_photo = config('app.books_cover_arts_folder') . "/" . $this_book[0]->book_cover_photo;
-                } else {
-                    $this_book[0]->book_cover_photo = config('app.books_cover_arts_folder') . "/sample_cover_art.jpg";
-                }
-                $this_book[0]->book_reference_url = config('app.url') . "/buy?ref=" . $this_book[0]->book_sys_id;
-
-                array_push($found_books, $this_book[0]);
-            }
-
-        }
-    */
+        $customer_item_detail_data = Order::where("order_user_id", auth()->user()->user_id)->orderBy('order_id','desc')->get();
 
         return response([
             "status" => "success", 
@@ -290,6 +410,90 @@ class UserController extends Controller
         ]);
     }
 
+
+    public function sendMessage(Request $request){
+        if (!Auth::guard('api')->check() || !$request->user()->tokenCan("use-mobile-apps-as-normal-user")) {
+            return response(["status" => "fail", "message" => "Permission Denied. Please log out and login again"]);
+        }
+
+        if (auth()->user()->user_flagged) {
+            $request->user()->token()->revoke();
+            return response(["status" => "fail", "message" => "Account access restricted"]);
+        }
+    
+        $validatedData = $request->validate([
+            "message" => "bail|required|max:1000",
+            "receiver_id" => "bail|integer",
+            "app_type" => "bail|required|max:8",
+            "app_version_code" => "bail|required|integer"
+        ]);
+
+        if(auth()->user()->user_id == 1) { // MESSAGE FROM ADMIN TO USER
+            $message["message_text"] = $request->message;
+            $message["message_sender_user_id"] = 1;
+            $message["message_receiver_id"] = $request->receiver_id;
+            $message = Message::create($message);
+
+            // SEND NOTIFICATION TO USER HERE
+            // SEND NOTIFICATION TO USER HERE
+            // SEND NOTIFICATION TO USER HERE
+            // SEND NOTIFICATION TO USER HERE
+            // SEND NOTIFICATION TO USER HERE
+            // SEND NOTIFICATION TO USER HERE
+            // SEND NOTIFICATION TO USER HERE
+            // SEND NOTIFICATION TO USER HERE
+            // SEND NOTIFICATION TO USER HERE
+            // SEND NOTIFICATION TO USER HERE
+        } else {
+            $message["message_text"] = $request->message;
+            $message["message_sender_user_id"] = auth()->user()->user_id;
+            $message["message_receiver_id"] = 1;
+            $message = Message::create($message);
+    
+            $email_data = array(
+                'message_text' => $request->message,
+                'user_name' => auth()->user()->user_first_name . " " . auth()->user()->user_last_name,
+                'user_id' => auth()->user()->user_id,
+                'user_phone' => auth()->user()->user_phone,
+                'time' => date("F j, Y, g:i a")
+            );
+            Mail::to(config('app.supportemail'))->send(new GeneralMailToAdmin($email_data));
+        }
+
+        return response([
+            "status" => "success", 
+            "message" => "Message sent"
+        ]);
+    
+    }
+
+
+    public function getMyMessages(Request $request)
+    {
+        if (!Auth::guard('api')->check() || !$request->user()->tokenCan("use-mobile-apps-as-normal-user")) {
+            return response(["status" => "fail", "message" => "Permission Denied. Please log out and login again"]);
+        }
+
+        if (auth()->user()->user_flagged) {
+            $request->user()->token()->revoke();
+            return response(["status" => "fail", "message" => "Account access restricted"]);
+        }
+    
+
+        // MAKING SURE THE INPUT HAS THE EXPECTED VALUES
+        $validatedData = $request->validate([
+            "app_type" => "bail|required|max:8",
+            "app_version_code" => "bail|required|integer"
+        ]);
+    
+        $customer_item_detail_data = Message::where("message_sender_user_id", auth()->user()->user_id)->orWhere('message_receiver_id', auth()->user()->user_id)->orderBy('message_id','asc')->take(50)->get();
+
+        return response([
+            "status" => "success", 
+            "message" => "Operation successful", 
+            "data" => $customer_item_detail_data
+        ]);
+    }
 
 
 }

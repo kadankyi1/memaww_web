@@ -20,3 +20,9 @@ Route::middleware('auth:api')->post('/v1/user/request-collection-callback', [App
 
 // GET MY ORDERS
 Route::middleware('auth:api')->post('/v1/user/get-my-orders', [App\Http\Controllers\version1\UserController::class, 'getMyOrdersListing']);
+
+// SEND MESSAGE
+Route::middleware('auth:api')->post('/v1/user/send-message', [App\Http\Controllers\version1\UserController::class, 'sendMessage']);
+
+// GET MY MESSAGES
+Route::middleware('auth:api')->post('/v1/user/get-my-messages', [App\Http\Controllers\version1\UserController::class, 'getMyMessages']);
