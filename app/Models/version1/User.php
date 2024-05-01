@@ -12,6 +12,13 @@ use App\Models\version1\Order;
 class User extends Authenticatable
 {    
     use HasApiTokens, HasFactory, Notifiable;
+    protected $appends = ['user_id_string'];
+
+
+    public function getUserIdStringAttribute()
+    {
+        return strval($this->user_id);
+    }
 
     /**
      * The primary key associated with the table.
@@ -72,6 +79,7 @@ class User extends Authenticatable
     public function userCountry(){
         return $this->hasOne(Country::class, 'country_id', 'user_country_id');
     }
+
 
 
 

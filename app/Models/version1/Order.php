@@ -11,12 +11,12 @@ use Illuminate\Notifications\Notifiable;
 class Order extends Model
 {    
     use HasFactory;
-    protected $appends = ['all_items', 'order_date'];
+    protected $appends = ['all_items', 'order_date', 'order_status_message', 'order_final_amt_with_currency', 'order_id_string', 'order_user_id_string'];
 
     //define accessor
     public function getAllItemsAttribute()
     {
-        return $this->order_lightweightitems_just_wash_quantity + $this->order_lightweightitems_wash_and_iron_quantity + $this->order_bulkyitems_just_wash_quantity + $this->order_bulkyitems_wash_and_iron_quantity;
+        return strval($this->order_lightweightitems_just_wash_quantity + $this->order_lightweightitems_wash_and_iron_quantity + $this->order_bulkyitems_just_wash_quantity + $this->order_bulkyitems_wash_and_iron_quantity);
 
     }
     //define accessor
@@ -24,6 +24,42 @@ class Order extends Model
     {
         return date('M j',strtotime($this->created_at));
 
+    }
+
+    public function getOrderStatusMessageAttribute()
+    {
+        //0=pending_user_confirmation, 1=pending_payment, 2-payment_made_pending_collector_assignment, 3-Collected, 4-Washing, 5-assigned_for_delivery, 6-completed
+        if($this->order_status == 0){
+            return "Pending";
+        } else if($this->order_status == 2){
+            return "Assigned For Pickup";
+        } else if($this->order_status == 3){
+            return "Picked Up";
+        } else if($this->order_status == 4){
+            return "Washing";
+        } else if($this->order_status == 5){
+            return "Assigned For Delivery";
+        } else if($this->order_status == 6){
+            return "Completed";
+        } else {
+            return "Unknown";
+        }
+    }
+
+    public function getOrderFinalAmtWithCurrencyAttribute()
+    {
+        return $this->order_user_countrys_currency . $this->order_final_price_in_user_countrys_currency;
+    }
+
+    public function getOrderUserIdStringAttribute()
+    {
+        return strval($this->order_user_id);
+    }
+
+
+    public function getOrderIdStringAttribute()
+    {
+        return strval($this->order_id);
     }
 
     /**
@@ -59,6 +95,7 @@ class Order extends Model
         'order_bulkyitems_just_wash_quantity',
         'order_bulkyitems_wash_and_iron_quantity',
         'order_all_items_full_description',
+        'special_instructions',
         'order_country_id',
         'order_user_countrys_currency',
         'order_discount_id',

@@ -32,6 +32,7 @@ class CreateOrdersTable extends Migration
             $table->bigInteger('order_lightweightitems_just_iron_quantity')->nullable();
             $table->bigInteger('order_bulkyitems_just_wash_quantity')->nullable();
             $table->bigInteger('order_bulkyitems_wash_and_iron_quantity')->nullable();
+            $table->text('special_instructions')->nullable();
             $table->string('order_user_countrys_currency', 255);
             $table->decimal('order_discount_amount_in_user_countrys_currency',9,2);
             $table->decimal('order_discount_amount_in_dollars_at_the_time',9,2);

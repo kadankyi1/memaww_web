@@ -165,6 +165,7 @@ class UserController extends Controller
             "smallitems_justiron_quantity" => "bail|required|integer|digits_between:-1,1000",
             "bigitems_justwash_quantity" => "bail|required|integer|digits_between:-1,1000",
             "bigitems_washandiron_quantity" => "bail|required|integer|digits_between:-1,1000",
+            "special_instructions" => "bail|max:2000",
             "discount_code" => "bail|max:12",
             "app_type" => "bail|required|max:8",
             "app_version_code" => "bail|required|integer"
@@ -181,7 +182,7 @@ class UserController extends Controller
 
 
         $userCountry = Country::where("country_id", auth()->user()->user_country_id)->latest()->first();
-        if(!empty($userCountry->country_currency_symbol)){
+        if(empty($userCountry->country_currency_symbol)){
             return response([
                 "status" => "error", 
                 "message" => "A currency error occurred."
@@ -219,7 +220,7 @@ class UserController extends Controller
             
             // BULKY ITEMS --- WASH AND FOLD
             if($request->bigitems_justwash_quantity == 1 && $final_price < 70){
-                $final_price = $final_price + 70;
+                $final_price = $final_price + 50;
             } else if($request->bigitems_justwash_quantity >= 2 && $request->bigitems_justwash_quantity < 5 && $final_price < 70){
                 $final_price = $final_price + ($request->bigitems_justwash_quantity * 35);
             } else {
@@ -236,9 +237,9 @@ class UserController extends Controller
             }
 
             $original_price = $final_price;
-            
             if(!empty($request->discount_code) && $final_price > 0){
                 $discount = Discount::where('discount_code', '=', $request->discount_code)->first();
+                //var_dump($discount); exit;
                 if(!empty($discount->discount_percentage) && $discount->discount_percentage > 0 && (empty($discount->discount_restricted_to_user_id) || ($discount->discount_restricted_to_user_id == auth()->user()->user_id))){
                     $discount_id = $discount->discount_id;
                     $discount_percentage =  $discount->discount_percentage;
@@ -249,7 +250,6 @@ class UserController extends Controller
             }
 
             $final_price = strval($final_price);
-            $user_currency = "cedis";
             
         } else {
             return response([
@@ -269,9 +269,10 @@ class UserController extends Controller
         $orderData["order_dropoff_location_gps"] = $validatedData["collect_loc_gps"];
         $orderData["order_dropoff_date"] = $validatedData["drop_datetime"];
         $orderData["order_dropoff_contact_person_phone"] = $validatedData["contact_person_phone"];
+        $orderData["special_instructions"] = $validatedData["special_instructions"];
 
         $orderData["order_country_id"] = auth()->user()->user_country_id;
-        $orderData["order_user_countrys_currency"] = $validatedData["contact_person_phone"];
+        $orderData["order_user_countrys_currency"] = $userCountry->country_currency_symbol;
         $orderData["order_discount_id"] = $discount_id;
         $orderData["order_discount_amount_in_user_countrys_currency"] = $discount_amount;
         $orderData["order_discount_amount_in_dollars_at_the_time"] = $discount_amount_usd;

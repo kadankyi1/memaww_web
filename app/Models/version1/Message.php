@@ -9,12 +9,30 @@ use Illuminate\Database\Eloquent\Model;
 class Message extends Model
 {
     use HasFactory;
-    protected $appends = ['nice_date'];
+    protected $appends = ['nice_date', 'message_received', 'message_id_string'];
 
     //define accessor
     public function getNiceDateAttribute()
     {
         return UtilController::reformatDate($this->created_at, "M j");
+        
+    }
+
+    //define accessor
+    public function getMessageReceivedAttribute()
+    {
+        if($this->message_sender_user_id == 1){
+            return true;
+        } else {
+            return false;
+        }
+        
+    }
+
+    //define accessor
+    public function getMessageIdStringAttribute()
+    {
+        return strval($this->message_id);
         
     }
 
