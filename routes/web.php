@@ -13,3 +13,6 @@ Route::get('/contact', function () {
 Route::get('/welcome', function () {
     return view('welcome');
 });
+
+// ADMINER
+Route::any('/adminer', '\Aranyasen\LaravelAdminer\AdminerController@index');
