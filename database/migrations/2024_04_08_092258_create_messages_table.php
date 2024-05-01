@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('messages', function (Blueprint $table) {
             $table->bigIncrements('message_id');
-            $table->text('message_text')->default("");
+            $table->text('message_text');
             $table->timestamps();
         });
 
