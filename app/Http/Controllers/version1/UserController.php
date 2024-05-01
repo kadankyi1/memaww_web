@@ -220,9 +220,7 @@ class UserController extends Controller
             
             // BULKY ITEMS --- WASH AND FOLD
             if($request->bigitems_justwash_quantity == 1 && $final_price < 70){
-
                 $final_price = $final_price + 50;
-                
             } else if($request->bigitems_justwash_quantity >= 2 && $request->bigitems_justwash_quantity < 5 && $final_price < 70){
                 $final_price = $final_price + ($request->bigitems_justwash_quantity * 35);
             } else {
