@@ -4,6 +4,10 @@
   <title>Service Policy - MeMaww</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <meta name="description" content="Service Policy - MeMaww">
+  <meta name="keywords" content="Service Policy MeMaww, Policy MeMaww, Service MeMaww, MeMaww Laundry, Ghana Laundry, Laundry Ghana">
+  <meta name="author" content="Dankyi Anno Kwaku">
   
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
