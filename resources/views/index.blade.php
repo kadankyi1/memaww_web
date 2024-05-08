@@ -26,7 +26,7 @@
 <body>
 	<nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
 		<div class="container">
-			<a class="navbar-brand" href="/" style="font-family: MeMaww; font-size: 30px">MeMaww<span style="font-family: sans-serif">A Laundry Company</span></a>
+			<a class="navbar-brand" href="index.html" style="font-family: MeMaww; font-size: 30px">MeMaww<span style="font-family: sans-serif">A Laundry Company</span></a>
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
 				<span class="oi oi-menu"></span> Menu
 			</button>
@@ -34,8 +34,8 @@
 			<div class="collapse navbar-collapse" id="ftco-nav">
 				<ul class="navbar-nav ml-auto">
 					<li class="nav-item active"><a href="/" class="nav-link">Order</a></li>
-					<li class="nav-item"><a href="destination.html" class="nav-link">iOS App</a></li>
-					<li class="nav-item"><a href="hotel.html" class="nav-link">Android App</a></li>
+					<li class="nav-item"><a href="#apps" class="nav-link">iOS App</a></li>
+					<li class="nav-item"><a href="#apps" class="nav-link">Android App</a></li>
 					<li class="nav-item"><a href="/contact" class="nav-link">Contact</a></li>
 				</ul>
 			</div>
@@ -195,8 +195,8 @@
 			<div class="container">
 				<div class="row d-flex">
 					<div class="col-md-6 order-md-last heading-section pl-md-5 ftco-animate d-flex align-items-center">
-						<div class="w-100">
-							<span class="subheading" style="font-family: sans-serif; font-size: 19px; font-style:italic">Look Good With MeMaww</span>
+						<div class="w-100" id="apps">
+							<span class="subheading" style="font-family: sans-serif; font-size: 19px; font-style:italic">Our app is still being developed. Check back here for an update</span>
 							<h2 class="mb-4">Download The App</h2>
 							<p>
 								MeMaww makes laundry simple again. Just schedule a pickup online or through our app when it's convenient for you.
@@ -364,33 +364,34 @@
 					<div class="col-md pt-5">
 						<div class="ftco-footer-widget pt-md-5 mb-4">
 							<h2 class="ftco-heading-2">About</h2>
-							<p>A company born out of a will to serve, we are striving to make laundry so afforable to the point where it is accessible to all. </p>
+							<p>
+								A company born out of a will to serve society. 
+								We are striving to make our laundry service the most effective, afforable and convenient to the point where it is easily accessible and preferred by all. </p>
+							<!--
 							<ul class="ftco-footer-social list-unstyled float-md-left float-lft">
 								<li class="ftco-animate"><a href="#"><span class="fa fa-twitter"></span></a></li>
 								<li class="ftco-animate"><a href="#"><span class="fa fa-facebook"></span></a></li>
 								<li class="ftco-animate"><a href="#"><span class="fa fa-instagram"></span></a></li>
 							</ul>
+							-->
 						</div>
 					</div>
 					<div class="col-md pt-5 border-left">
 						<div class="ftco-footer-widget pt-md-5 mb-4 ml-md-5">
 							<h2 class="ftco-heading-2">Policies</h2>
 							<ul class="list-unstyled">
-								<li><a href="#" class="py-2 d-block">Privacy Policy</a></li>
-								<li><a href="#" class="py-2 d-block">Service Policy</a></li>
+								<li><a href="/privacy-policy" class="py-2 d-block">Privacy Policy</a></li>
+								<li><a href="/service-policy" class="py-2 d-block">Service Policy</a></li>
 							</ul>
 						</div>
 					</div>
 					<div class="col-md pt-5 border-left">
 						<div class="ftco-footer-widget pt-md-5 mb-4">
-							<h2 class="ftco-heading-2">Experience</h2>
+							<h2 class="ftco-heading-2">Apps & Links</h2>
 							<ul class="list-unstyled">
-								<li><a href="#" class="py-2 d-block">Adventure</a></li>
-								<li><a href="#" class="py-2 d-block">Hotel and Restaurant</a></li>
-								<li><a href="#" class="py-2 d-block">Beach</a></li>
-								<li><a href="#" class="py-2 d-block">Nature</a></li>
-								<li><a href="#" class="py-2 d-block">Camping</a></li>
-								<li><a href="#" class="py-2 d-block">Party</a></li>
+								<li><a href="#" class="py-2 d-block">Android App</a></li>
+								<li><a href="#" class="py-2 d-block">iOs App</a></li>
+								<li><a href="https://infodefa.com" class="py-2 d-block">Parent Company</a></li>
 							</ul>
 						</div>
 					</div>
@@ -400,8 +401,8 @@
 							<div class="block-23 mb-3">
 								<ul>
 									<li><span class="icon fa fa-map-marker"></span><span class="text">AF26 Coffee Hwy, Adenta - West, Ghana, West Africa</span></li>
-									<li><a href="#"><span class="icon fa fa-phone"></span><span class="text">+233(0) 53 506 5535</span></a></li>
-									<li><a href="#"><span class="icon fa fa-paper-plane"></span><span class="text">support@memaww.com</span></a></li>
+									<li><a href="tel://+233535065535"><span class="icon fa fa-phone"></span><span class="text">+233(0) 53 506 5535</span></a></li>
+									<li><a href="mailto:support@memaww.com"><span class="icon fa fa-paper-plane"></span><span class="text">support@memaww.com</span></a></li>
 								</ul>
 							</div>
 						</div>
@@ -411,7 +412,7 @@
 					<div class="col-md-12 text-center">
 
 						<p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-							Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+							Copyright &copy;<script>document.write(new Date().getFullYear());</script> InfoDeFa Company Ltd. All rights reserved | Made with <i class="fa fa-heart" aria-hidden="true"></i></a>
 							<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
 						</div>
 					</div>

@@ -32,12 +32,12 @@
      </button>
 
      <div class="collapse navbar-collapse" id="ftco-nav">
-       <ul class="navbar-nav ml-auto">
-        <li class="nav-item active"><a href="/" class="nav-link">Order</a></li>
-        <li class="nav-item"><a href="destination.html" class="nav-link">iOS App</a></li>
-        <li class="nav-item"><a href="hotel.html" class="nav-link">Android App</a></li>
-        <li class="nav-item"><a href="/contact" class="nav-link">Contact</a></li>
-     </ul>
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item"><a href="/" class="nav-link">Order</a></li>
+        <li class="nav-item"><a href="/#apps" class="nav-link">iOS App</a></li>
+        <li class="nav-item"><a href="/#apps" class="nav-link">Android App</a></li>
+        <li class="nav-item active"><a href="/contact" class="nav-link">Contact</a></li>
+      </ul>
      </div>
    </div>
  </nav>
@@ -47,7 +47,7 @@
   <div class="container">
     <div class="row no-gutters slider-text js-fullheight align-items-end justify-content-center">
       <div class="col-md-9 ftco-animate pb-5 text-center">
-       <p class="breadcrumbs"><span class="mr-2"><a href="index.html">Home <i class="fa fa-chevron-right"></i></a></span> <span>Contact us <i class="fa fa-chevron-right"></i></span></p>
+       <p class="breadcrumbs"><span class="mr-2"><a href="/">Home <i class="fa fa-chevron-right"></i></a></span> <span>Contact us <i class="fa fa-chevron-right"></i></span></p>
        <h1 class="mb-0 bread">Contact us</h1>
      </div>
    </div>
@@ -112,33 +112,34 @@
       <div class="col-md pt-5">
         <div class="ftco-footer-widget pt-md-5 mb-4">
           <h2 class="ftco-heading-2">About</h2>
-          <p>A company born out of a will to serve, we are striving to make laundry so afforable to the point where it is accessible to all. </p>
+          <p>
+            A company born out of a will to serve society. 
+            We are striving to make our laundry service the most effective, afforable and convenient to the point where it is easily accessible and preferred by all. </p>
+          <!--
           <ul class="ftco-footer-social list-unstyled float-md-left float-lft">
             <li class="ftco-animate"><a href="#"><span class="fa fa-twitter"></span></a></li>
             <li class="ftco-animate"><a href="#"><span class="fa fa-facebook"></span></a></li>
             <li class="ftco-animate"><a href="#"><span class="fa fa-instagram"></span></a></li>
           </ul>
+          -->
         </div>
       </div>
       <div class="col-md pt-5 border-left">
         <div class="ftco-footer-widget pt-md-5 mb-4 ml-md-5">
-          <h2 class="ftco-heading-2">Infromation</h2>
+          <h2 class="ftco-heading-2">Policies</h2>
           <ul class="list-unstyled">
-            <li><a href="#" class="py-2 d-block">Online Enquiry</a></li>
-            <li><a href="#" class="py-2 d-block">General Enquiries</a></li>
-            <li><a href="#" class="py-2 d-block">Booking Conditions</a></li>
-            <li><a href="#" class="py-2 d-block">Privacy and Policy</a></li>
-            <li><a href="#" class="py-2 d-block">Refund Policy</a></li>
-            <li><a href="#" class="py-2 d-block">Call Us</a></li>
+            <li><a href="/privacy-policy" class="py-2 d-block">Privacy Policy</a></li>
+            <li><a href="/service-policy" class="py-2 d-block">Service Policy</a></li>
           </ul>
         </div>
       </div>
       <div class="col-md pt-5 border-left">
         <div class="ftco-footer-widget pt-md-5 mb-4">
-          <h2 class="ftco-heading-2">Mobile Apps</h2>
+          <h2 class="ftco-heading-2">Apps & Links</h2>
           <ul class="list-unstyled">
-            <li><a href="#" class="py-2 d-block">Download- Google Play Store</a></li>
-            <li><a href="#" class="py-2 d-block">Download - iPhone</a></li>
+            <li><a href="#" class="py-2 d-block">Android App</a></li>
+            <li><a href="#" class="py-2 d-block">iOs App</a></li>
+            <li><a href="https://infodefa.com" class="py-2 d-block">Parent Company</a></li>
           </ul>
         </div>
       </div>
@@ -148,8 +149,8 @@
           <div class="block-23 mb-3">
             <ul>
               <li><span class="icon fa fa-map-marker"></span><span class="text">AF26 Coffee Hwy, Adenta - West, Ghana, West Africa</span></li>
-              <li><a href="#"><span class="icon fa fa-phone"></span><span class="text">+233(0) 53 506 5535</span></a></li>
-              <li><a href="#"><span class="icon fa fa-paper-plane"></span><span class="text">support@memaww.com</span></a></li>
+              <li><a href="tel://+233535065535"><span class="icon fa fa-phone"></span><span class="text">+233(0) 53 506 5535</span></a></li>
+              <li><a href="mailto:support@memaww.com"><span class="icon fa fa-paper-plane"></span><span class="text">support@memaww.com</span></a></li>
             </ul>
           </div>
         </div>
@@ -159,12 +160,13 @@
       <div class="col-md-12 text-center">
 
         <p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-          Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+          Copyright &copy;<script>document.write(new Date().getFullYear());</script> InfoDeFa Company Ltd. All rights reserved | Made with <i class="fa fa-heart" aria-hidden="true"></i></a>
           <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
         </div>
       </div>
     </div>
   </footer>
+  
   
 
 
