@@ -3,13 +3,25 @@
 return [
     /*
     |--------------------------------------------------------------------------
+    | PAYMENT_GATEWAY
+    |--------------------------------------------------------------------------
+    |
+    */
+
+    'payment_gateway_merchant_id' => env('PAYMENT_GATEWAY_MERCHANT_ID', ''),
+    'payment_gateway_merchant_api_user' => env('PAYMENT_GATEWAY_MERCHANT_API_USER', ''),
+    'payment_gateway_merchant_api_key' => env('PAYMENT_GATEWAY_MERCHANT_API_KEY', ''),
+
+
+    /*
+    |--------------------------------------------------------------------------
     | DOLLAR RATES
     |--------------------------------------------------------------------------
     |
     */
 
     // SUPPORT EMAIL
-    'one_dollar_to_one_ghana_cedi' => env('ONE_DOLLAR_ONE_GHANA_CEDI', 13.5),
+    'one_dollar_to_one_ghana_cedi' => env('ONE_DOLLAR_ONE_GHANA_CEDI', 13.9),
 
 
     /*

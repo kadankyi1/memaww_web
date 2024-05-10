@@ -257,7 +257,7 @@ class UserController extends Controller
                 "message" => "Service not available in your country."
             ]);
         }
-        $orderData["order_sys_id"] = auth()->user()->user_id . "_" . date("YmdHis") . UtilController::getRandomString(4);
+        $orderData["order_sys_id"] = auth()->user()->user_id . "_" .date("YmdHis") . UtilController::getRandomString(4);
         $orderData["order_user_id"] = auth()->user()->user_id;
         $orderData["order_laundrysp_id"] = 1; // MeMaww Ghana
         //$orderData["order_collection_biker_name"] = "";
@@ -299,11 +299,86 @@ class UserController extends Controller
             "discount_percentage" => $userCountry->country_currency_symbol . strval($discount_percentage), 
             "discount_amount" => $userCountry->country_currency_symbol . strval($discount_amount), 
             "price_final" => $userCountry->country_currency_symbol . strval($final_price), 
+            "price_final_no_currency" => strval($final_price), 
+            "user_email" => auth()->user()->user_phone . "@memaww.com", 
+            "txn_narration" => "Laundry pickup request by " . auth()->user()->user_last_name . " " . auth()->user()->user_first_name, 
+            "txn_reference" => sprintf("%012d", $order->order_id), 
+            "merchant_id" => config('app.payment_gateway_merchant_id'), 
+            "merchant_api_user" => config('app.payment_gateway_merchant_api_user'), 
+            "merchant_api_key" => config('app.payment_gateway_merchant_api_key'), 
+            "return_url" => config('app.url') . "/payment/" . $order->order_sys_id, 
             "message" => "Order created"
         ]);
     
     }
     
+    public function updateOrderPaymentStatus(Request $request){
+        if (!Auth::guard('api')->check() || !$request->user()->tokenCan("use-mobile-apps-as-normal-user")) {
+            return response(["status" => "fail", "message" => "Permission Denied. Please log out and login again"]);
+        }
+
+        if (auth()->user()->user_flagged) {
+            $request->user()->token()->revoke();
+            return response(["status" => "fail", "message" => "Account access restricted"]);
+        }
+    
+        $validatedData = $request->validate([
+            "order_id" => "bail|required|max:100",
+            "order_payment_status" => "bail|required|max:100",
+            "order_payment_details" => "bail|required|max:200",
+            "order_payment_method" => "bail|required|max:200",
+            "purge" => "bail|required|integer",
+            "app_type" => "bail|required|max:8",
+            "app_version_code" => "bail|required|integer"
+        ]);
+
+        
+        //echo "ID: " . strval(intval($request->order_id));exit;
+        $the_order = Order::where('order_id', '=', strval(intval($request->order_id)))->first();
+        if($the_order === null){
+            return response([
+                "status" => "error", 
+                "message" => "Order not found"
+            ]);
+        }
+
+        if($the_order->order_status != 0){
+            return response([
+                "status" => "error", 
+                "message" => "Order in advanced state"
+            ]);
+        }
+
+        if($request->order_payment_status == "approved"){
+            $the_order->order_status = 1;
+            $the_order->order_payment_method = $request->order_payment_method;
+            $the_order->order_payment_status = 1;
+            $the_order->order_payment_details = $request->order_payment_details;
+            $the_order->save();
+            return response([
+                "status" => "success", 
+                "message" => "Order updated"
+            ]);
+        } else {
+            if($request->purge){
+                $the_order->delete();
+                return response([
+                    "status" => "success", 
+                    "message" => "Order deleted"
+                ]);
+            } else {
+                $the_order->order_status = 7;
+                $the_order->order_payment_method = $request->order_payment_method;
+                $the_order->order_payment_status = 2; // FAILED PAYMENT
+                $the_order->order_payment_details = $request->order_payment_details;
+                $the_order->save();
+            }
+        }
+
+
+
+    }
+
 
     public function confirmCollectionRequestOrder(Request $request){
 

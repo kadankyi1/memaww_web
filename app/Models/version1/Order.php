@@ -28,9 +28,16 @@ class Order extends Model
 
     public function getOrderStatusMessageAttribute()
     {
-        //0=pending_user_confirmation, 1=pending_payment, 2-payment_made_pending_collector_assignment, 3-Collected, 4-Washing, 5-assigned_for_delivery, 6-completed
+        //0=pending_user_confirmation, 
+        //1=pending_payment, 
+        //2-payment_made_pending_collector_assignment, 
+        //3-Collected, 4-Washing, 
+        //5-assigned_for_delivery, 
+        //6-completed
         if($this->order_status == 0){
             return "Pending";
+        } else if($this->order_status == 1){
+            return "Pending Pickup Assignment";
         } else if($this->order_status == 2){
             return "Assigned For Pickup";
         } else if($this->order_status == 3){
@@ -41,6 +48,8 @@ class Order extends Model
             return "Assigned For Delivery";
         } else if($this->order_status == 6){
             return "Completed";
+        } else if($this->order_status == 7){
+            return "Payment Failed";
         } else {
             return "Unknown";
         }
@@ -104,6 +113,7 @@ class Order extends Model
         'order_final_price_in_user_countrys_currency',
         'order_final_price_in_dollars_at_the_time',
         'order_status',
+        'order_payment_method',
         'order_payment_status',
         'order_payment_details',
         'order_flagged',
