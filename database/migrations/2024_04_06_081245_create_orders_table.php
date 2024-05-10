@@ -42,6 +42,12 @@ class CreateOrdersTable extends Migration
             $table->string('order_payment_method', 255)->nullable();
             $table->integer('order_payment_status')->default(0);
             $table->text('order_payment_details')->nullable();
+            //
+            $table->string('order_picker_name', 255)->nullable();
+            $table->string('order_picker_phone', 255)->nullable();
+            $table->string('order_deliverer_name', 255)->nullable();
+            $table->string('order_deliverer_phone', 255)->nullable();
+            //
             $table->text('order_all_items_full_description')->nullable();
             $table->boolean('order_flagged')->default(false);
             $table->text('order_flagged_reason');

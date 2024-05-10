@@ -374,10 +374,151 @@ class UserController extends Controller
                 $the_order->save();
             }
         }
+    }
+
+    public function updateOrder(Request $request){
+        if (!Auth::guard('api')->check() || !$request->user()->tokenCan("use-mobile-apps-as-normal-user")) {
+            return response(["status" => "fail", "message" => "Permission Denied. Please log out and login again"]);
+        }
+
+        if (auth()->user()->user_flagged) {
+            $request->user()->token()->revoke();
+            return response(["status" => "fail", "message" => "Account access restricted"]);
+        }
+    
+        $validatedData = $request->validate([
+            "order_id" => "bail|required|max:100",
+            "new_status" => "bail|required|max:100",
+            "order_payment_status" => "bail|max:100",
+            "order_payment_details" => "bail|max:200",
+            "order_payment_method" => "bail|max:200",
+            "order_delete" => "bail|integer",
+            "biker_name" => "bail|max:100",
+            "biker_phone" => "bail|max:100",
+            "order_all_items_full_description" => "bail|max:200",
+            "app_type" => "bail|required|max:8",
+            "app_version_code" => "bail|required|integer"
+        ]);
+
+        
+        //echo "ID: " . strval(intval($request->order_id));exit;
+        $the_order = Order::where('order_id', '=', strval(intval($request->order_id)))->first();
+        if($the_order === null){
+            return response([
+                "status" => "error", 
+                "message" => "Order not found"
+            ]);
+        }
+
+        // PAYMENT INFO CHANGE
+        if($the_order->order_status == 0 && intval($request->new_status) == 1){
+            if(empty($request->order_payment_method) || empty($request->order_payment_details)){
+                return response([
+                    "status" => "error", 
+                    "message" => "Make sure to fill in the payment method and payment details"
+                ]);
+            }
+            if($request->order_payment_status == "approved"){
+                $the_order->order_status = 1; // PENDING ASSIGNMENT TO PICKER SINCE PAYMENT IS MADE. 
+                $the_order->order_payment_method = $request->order_payment_method;
+                $the_order->order_payment_status = 1;
+                $the_order->order_payment_details = $request->order_payment_details;
+                $the_order->save();
+                return response([
+                    "status" => "success", 
+                    "message" => "Order payment updated"
+                ]);
+            } else {
+                if($request->order_delete){
+                    $the_order->delete();
+                    return response([
+                        "status" => "success", 
+                        "message" => "Order deleted for non payment"
+                    ]);
+                } else {
+                    $the_order->order_status = 7;
+                    $the_order->order_payment_method = $request->order_payment_method;
+                    $the_order->order_payment_status = 2; // FAILED PAYMENT
+                    $the_order->order_payment_details = $request->order_payment_details;
+                    $the_order->save();
+                }
+            }
+        } 
+        // ASSIGNING PICKER
+        else if($the_order->order_status == 1 && intval($request->new_status) == 2){
+            if(empty($request->biker_name) || empty($request->biker_phone)){
+                return response([
+                    "status" => "error", 
+                    "message" => "Make sure to fill in the biker name and biker phone number"
+                ]);
+            }
+            $the_order->order_status = 2; // PICKER ASSIGNED GOING TO PICKUP. 
+            $the_order->order_picker_name = $request->biker_name;
+            $the_order->order_picker_phone = $request->biker_phone;
+            $the_order->save();
+            return response([
+                "status" => "success", 
+                "message" => "Order assigned for pickup"
+            ]);
+        }
+
+        // PICKED UP OR WASHING
+        else if($the_order->order_status == 2 && (intval($request->new_status) == 3 || intval($request->new_status) == 4)){
+            if(empty($request->order_all_items_full_description)){
+                return response([
+                    "status" => "error", 
+                    "message" => "Make sure to fill in full description of items picked up"
+                ]);
+            }
+            $the_order->order_status = intval($request->new_status); // WASHING OR PICKED
+            $the_order->order_all_items_full_description = $request->order_all_items_full_description; 
+            $the_order->save();
+            return response([
+                "status" => "success", 
+                "message" => "Order picked up or in washing"
+            ]);
+        }
+
+        // ASSIGNING TO DELIVERER
+        else if(($the_order->order_status == 3 || $the_order->order_status == 4) && intval($request->new_status) == 5){
+            if(empty($request->biker_name) || empty($request->biker_phone)){
+                return response([
+                    "status" => "error", 
+                    "message" => "Make sure to fill in the biker name and biker phone number"
+                ]);
+            }
+            $the_order->order_status = 5; // DELIVERER ASSIGNED GOING TO DELIVER. 
+            $the_order->order_deliverer_name = $request->biker_name;
+            $the_order->order_deliverer_phone = $request->biker_phone;
+            $the_order->save();
+            return response([
+                "status" => "success", 
+                "message" => "Order assigned for delivery"
+            ]);
+        }
 
 
+        // COMPLETING ORDER
+        else if($the_order->order_status == 5 && intval($request->new_status) == 6){
+            $the_order->order_status = 6; // DELIVERER ASSIGNED GOING TO DELIVER. 
+            $the_order->save();
+            return response([
+                "status" => "success", 
+                "message" => "Order completed"
+            ]);
+        }
+
+        // COMPLETING ORDER
+        else {
+            return response([
+                "status" => "error", 
+                "message" => "Set information right. Order status: " . $the_order->order_status_message
+            ]);
+        }
 
     }
+
+
 
 
     public function confirmCollectionRequestOrder(Request $request){

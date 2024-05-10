@@ -28,14 +28,14 @@ class Order extends Model
 
     public function getOrderStatusMessageAttribute()
     {
-        //0=pending_user_confirmation, 
-        //1=pending_payment, 
+        //0=pending Payment, 
+        //1=Pending Pickup Assignment, 
         //2-payment_made_pending_collector_assignment, 
         //3-Collected, 4-Washing, 
         //5-assigned_for_delivery, 
         //6-completed
         if($this->order_status == 0){
-            return "Pending";
+            return "Pending Payment";
         } else if($this->order_status == 1){
             return "Pending Pickup Assignment";
         } else if($this->order_status == 2){
@@ -116,6 +116,10 @@ class Order extends Model
         'order_payment_method',
         'order_payment_status',
         'order_payment_details',
+        'order_picker_name',
+        'order_picker_phone',
+        'order_deliverer_name',
+        'order_deliverer_phone',
         'order_flagged',
         'order_flagged_reason',
         'created_at',

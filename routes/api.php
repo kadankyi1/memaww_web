@@ -29,3 +29,6 @@ Route::middleware('auth:api')->post('/v1/user/get-my-messages', [App\Http\Contro
 
 // UPDATE ORDER PAYMENT
 Route::middleware('auth:api')->post('/v1/user/update-order-payment', [App\Http\Controllers\version1\UserController::class, 'updateOrderPaymentStatus']);
+
+// UPDATE ORDER PAYMENT
+Route::middleware('auth:api')->post('/v1/user/update-order', [App\Http\Controllers\version1\UserController::class, 'updateOrder']);
