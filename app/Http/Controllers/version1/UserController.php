@@ -692,8 +692,8 @@ class UserController extends Controller
                 $notification["notification_sender_admin_id"] = $request->admin_pin;
                 $notification = Notification::create($notification);
 
-                UtilController::sendNotificationToUser($user1->user_notification_token_android,"normal",$request->title, $request->short_body);
-                UtilController::sendNotificationToUser($user1->user_notification_token_ios,"normal",$request->title, $request->short_body);
+                UtilController::sendNotificationToUser($user1->user_notification_token_android,"normal","Message - MeMaww Support", "You have a new message from MeMaww Support");
+                UtilController::sendNotificationToUser($user1->user_notification_token_ios,"normal","Message - MeMaww Support", "You have a new message from MeMaww Support");
             }
 
         } else {
