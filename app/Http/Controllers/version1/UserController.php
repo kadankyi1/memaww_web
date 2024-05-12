@@ -666,24 +666,32 @@ class UserController extends Controller
         $validatedData = $request->validate([
             "message" => "bail|required|max:1000",
             "receiver_id" => "bail|integer",
+            "admin_pin" => "bail|integer",
             "app_type" => "bail|required|max:8",
             "app_version_code" => "bail|required|integer"
         ]);
 
         if(auth()->user()->user_id == 1) { // MESSAGE FROM ADMIN TO USER
+            if($request->admin_pin != 6011){
+                return response([
+                    "status" => "error", 
+                    "message" => "Incorrect Admin PIN"
+                ]);
+            }
             $message["message_text"] = $request->message;
             $message["message_sender_user_id"] = 1;
             $message["message_receiver_id"] = $request->receiver_id;
             $message = Message::create($message);
 
-            $notification["notification_title"] = "New Message";
-            $notification["notification_body"] = "MeMaww Support Team has sent you a message. Please check the Support menu";
-            $notification["notification_topic_or_receiver_phone"] = $request->topic_or_receiver_phone;
-            $notification["notification_sender_admin_id"] = $request->admin_pin;
-            $notification = Notification::create($notification);
-
             $user1 = User::where('user_id', '=', $request->receiver_id)->first();
             if(!empty($user1->user_phone)){
+
+                $notification["notification_title"] = "New Message";
+                $notification["notification_body"] = "MeMaww Support Team has sent you a message. Please check the Support menu";
+                $notification["notification_topic_or_receiver_phone"] = $user1->user_phone;
+                $notification["notification_sender_admin_id"] = $request->admin_pin;
+                $notification = Notification::create($notification);
+
                 UtilController::sendNotificationToUser($user1->user_notification_token_android,"normal",$request->title, $request->short_body);
                 UtilController::sendNotificationToUser($user1->user_notification_token_ios,"normal",$request->title, $request->short_body);
             }
