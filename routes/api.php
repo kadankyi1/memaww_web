@@ -37,7 +37,7 @@ Route::middleware('auth:api')->post('/v1/user/update-order', [App\Http\Controlle
 Route::middleware('auth:api')->post('/v1/user/send-notification', [App\Http\Controllers\version1\UserController::class, 'sendNotification']);
 
 // GET MY NOTIFICATIONS
-Route::middleware('auth:api')->post('/v1/user/get-my-notifications', [App\Http\Controllers\version1\UserController::class, 'updateUserInfo']);
+Route::middleware('auth:api')->post('/v1/user/get-my-notifications', [App\Http\Controllers\version1\UserController::class, 'getMyNotificationsListing']);
 
 // UPDATE USER INFO
 Route::middleware('auth:api')->post('/v1/user/update-user-info', [App\Http\Controllers\version1\UserController::class, 'updateUserInfo']);
