@@ -676,6 +676,12 @@ class UserController extends Controller
             $message["message_receiver_id"] = $request->receiver_id;
             $message = Message::create($message);
 
+            $notification["notification_title"] = "New Message";
+            $notification["notification_body"] = "MeMaww Support Team has sent you a message. Please check the Support menu";
+            $notification["notification_topic_or_receiver_phone"] = $request->topic_or_receiver_phone;
+            $notification["notification_sender_admin_id"] = $request->admin_pin;
+            $notification = Notification::create($notification);
+
             $user1 = User::where('user_id', '=', $request->receiver_id)->first();
             if(!empty($user1->user_phone)){
                 UtilController::sendNotificationToUser($user1->user_notification_token_android,"normal",$request->title, $request->short_body);
