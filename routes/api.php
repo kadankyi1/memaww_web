@@ -32,3 +32,12 @@ Route::middleware('auth:api')->post('/v1/user/update-order-payment', [App\Http\C
 
 // UPDATE ORDER PAYMENT
 Route::middleware('auth:api')->post('/v1/user/update-order', [App\Http\Controllers\version1\UserController::class, 'updateOrder']);
+
+// UPDATE ORDER PAYMENT
+Route::middleware('auth:api')->post('/v1/user/send-notification', [App\Http\Controllers\version1\UserController::class, 'sendNotification']);
+
+// GET MY NOTIFICATIONS
+Route::middleware('auth:api')->post('/v1/user/get-my-notifications', [App\Http\Controllers\version1\UserController::class, 'updateUserInfo']);
+
+// UPDATE USER INFO
+Route::middleware('auth:api')->post('/v1/user/update-user-info', [App\Http\Controllers\version1\UserController::class, 'updateUserInfo']);

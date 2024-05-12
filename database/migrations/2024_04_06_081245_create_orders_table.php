@@ -39,6 +39,9 @@ class CreateOrdersTable extends Migration
             $table->decimal('order_final_price_in_user_countrys_currency',9,2);
             $table->decimal('order_final_price_in_dollars_at_the_time',9,2);
             $table->integer('order_status')->default(0);
+            //
+            $table->string('order_status_details', 255)->nullable();
+            //
             $table->string('order_payment_method', 255)->nullable();
             $table->integer('order_payment_status')->default(0);
             $table->text('order_payment_details')->nullable();

@@ -30,10 +30,12 @@ class Order extends Model
     {
         //0=pending Payment, 
         //1=Pending Pickup Assignment, 
-        //2-payment_made_pending_collector_assignment, 
-        //3-Collected, 4-Washing, 
-        //5-assigned_for_delivery, 
-        //6-completed
+        //2-Assigned For Pickup, 
+        //3-Picked up, 
+        //4-Washing,
+        //5-Assigned For Delivery, 
+        //6-completed,
+        //7-Payment failed
         if($this->order_status == 0){
             return "Pending Payment";
         } else if($this->order_status == 1){
@@ -49,7 +51,7 @@ class Order extends Model
         } else if($this->order_status == 6){
             return "Completed";
         } else if($this->order_status == 7){
-            return "Payment Failed";
+            return "Cancelled";
         } else {
             return "Unknown";
         }

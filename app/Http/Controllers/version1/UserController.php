@@ -13,6 +13,7 @@ use App\Models\version1\CollectionCallBackRequest;
 use App\Models\version1\Country;
 use App\Models\version1\Discount;
 use App\Models\version1\Message;
+use App\Models\version1\Notification;
 use App\Models\version1\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -366,12 +367,6 @@ class UserController extends Controller
                     "status" => "success", 
                     "message" => "Order deleted"
                 ]);
-            } else {
-                $the_order->order_status = 7;
-                $the_order->order_payment_method = $request->order_payment_method;
-                $the_order->order_payment_status = 2; // FAILED PAYMENT
-                $the_order->order_payment_details = $request->order_payment_details;
-                $the_order->save();
             }
         }
     }
@@ -389,10 +384,11 @@ class UserController extends Controller
         $validatedData = $request->validate([
             "order_id" => "bail|required|max:100",
             "new_status" => "bail|required|max:100",
+            "new_status_details" => "bail|max:200",
             "order_payment_status" => "bail|max:100",
             "order_payment_details" => "bail|max:200",
             "order_payment_method" => "bail|max:200",
-            "order_delete" => "bail|integer",
+            "order_delete" => "bail|max:1",
             "biker_name" => "bail|max:100",
             "biker_phone" => "bail|max:100",
             "order_all_items_full_description" => "bail|max:200",
@@ -462,25 +458,36 @@ class UserController extends Controller
             ]);
         }
 
-        // PICKED UP OR WASHING
-        else if($the_order->order_status == 2 && (intval($request->new_status) == 3 || intval($request->new_status) == 4)){
+        // PICKED UP
+        else if($the_order->order_status == 2 && intval($request->new_status) == 3){
             if(empty($request->order_all_items_full_description)){
                 return response([
                     "status" => "error", 
                     "message" => "Make sure to fill in full description of items picked up"
                 ]);
             }
-            $the_order->order_status = intval($request->new_status); // WASHING OR PICKED
+            $the_order->order_status = 3; // WASHING OR PICKED
             $the_order->order_all_items_full_description = $request->order_all_items_full_description; 
             $the_order->save();
             return response([
                 "status" => "success", 
-                "message" => "Order picked up or in washing"
+                "message" => "Order set to picked up"
+            ]);
+        }
+
+
+        // WASHING
+        else if($the_order->order_status == 3 && intval($request->new_status) == 4){
+            $the_order->order_status = intval($request->new_status); // WASHING
+            $the_order->save();
+            return response([
+                "status" => "success", 
+                "message" => "Order set to washing"
             ]);
         }
 
         // ASSIGNING TO DELIVERER
-        else if(($the_order->order_status == 3 || $the_order->order_status == 4) && intval($request->new_status) == 5){
+        else if($the_order->order_status == 4 && intval($request->new_status) == 5){
             if(empty($request->biker_name) || empty($request->biker_phone)){
                 return response([
                     "status" => "error", 
@@ -505,6 +512,23 @@ class UserController extends Controller
             return response([
                 "status" => "success", 
                 "message" => "Order completed"
+            ]);
+        }
+
+        // OTHER STATUS
+        else if($the_order->order_status == 0){
+            if(empty($request->new_status_details)){
+                return response([
+                    "status" => "error", 
+                    "message" => "Enter new status details"
+                ]);
+            }
+            $the_order->order_status = 7; // DELIVERER ASSIGNED GOING TO DELIVER. 
+            $the_order->order_status_details = $request->new_status_details;
+            $the_order->save();
+            return response([
+                "status" => "success", 
+                "message" => "Order status updated to cancelled with reason"
             ]);
         }
 
@@ -585,7 +609,7 @@ class UserController extends Controller
         $order = CollectionCallBackRequest::create($collectionRequestData);
     
         $email_data = array(
-            'message_text' => 'This user has requested a laundry collection request from the MeMaww Team',
+            'message_text' => 'Please call me to take my order. I need laundry collection.',
             'user_name' => auth()->user()->user_first_name . " " . auth()->user()->user_last_name,
             'user_phone' => auth()->user()->user_phone,
             'time' => date("F j, Y, g:i a")
@@ -710,6 +734,133 @@ class UserController extends Controller
             "message" => "Operation successful", 
             "data" => $customer_item_detail_data
         ]);
+    }
+
+    public function sendNotification(Request $request){
+        if (!Auth::guard('api')->check() || !$request->user()->tokenCan("use-mobile-apps-as-normal-user")) {
+            return response(["status" => "fail", "message" => "Permission Denied. Please log out and login again"]);
+        }
+
+        if (auth()->user()->user_flagged) {
+            $request->user()->token()->revoke();
+            return response(["status" => "fail", "message" => "Account access restricted"]);
+        }
+
+        $validatedData = $request->validate([
+            "title" => "bail|required|max:50",
+            "short_body" => "bail|required|max:100",
+            "body" => "bail|required|max:1000",
+            "topic_or_receiver_phone" => "bail|required|max:15",
+            "admin_pin" => "bail|required|integer",
+            "app_type" => "bail|required|max:8",
+            "app_version_code" => "bail|required|integer"
+        ]);
+
+        if($request->admin_pin == 6011) { // MESSAGE FROM ADMIN TO USER
+            $notification["notification_title"] = $request->title;
+            $notification["notification_body"] = $request->body;
+            $notification["notification_topic_or_receiver_phone"] = $request->topic_or_receiver_phone;
+            $notification["notification_sender_admin_id"] = $request->admin_pin;
+            $notification = Notification::create($notification);
+
+
+            if($request->topic_or_receiver_phone == "ALL_USERS" || $request->topic_or_receiver_phone == "ANDROID_USERS" || $request->topic_or_receiver_phone == "IPHONE_USERS"){
+                UtilController::sendNotificationToTopic($request->topic_or_receiver_phone,"normal",$request->title, $request->short_body);
+            } else { // SPECIFIC USERS
+                $user1 = User::where('user_phone', '=', $request->topic_or_receiver_phone)->first();
+                if(!empty($user1->user_phone)){
+                    UtilController::sendNotificationToUser($user1->user_notification_token_android,"normal",$request->title, $request->short_body);
+                    UtilController::sendNotificationToUser($user1->user_notification_token_ios,"normal",$request->title, $request->short_body);
+                }
+            }
+
+            return response([
+                "status" => "success", 
+                "message" => "Notification sent"
+            ]);
+        } 
+
+        return response([
+            "status" => "error", 
+            "message" => "Incorrect Admin PIN"
+        ]);
+    
+    }
+
+
+    public function getMyNotificationsListing(Request $request)
+    {
+        if (!Auth::guard('api')->check() || !$request->user()->tokenCan("use-mobile-apps-as-normal-user")) {
+            return response(["status" => "fail", "message" => "Permission Denied. Please log out and login again"]);
+        }
+
+        if (auth()->user()->user_flagged) {
+            $request->user()->token()->revoke();
+            return response(["status" => "fail", "message" => "Account access restricted"]);
+        }
+    
+
+        // MAKING SURE THE INPUT HAS THE EXPECTED VALUES
+        $validatedData = $request->validate([
+            "app_type" => "bail|required|max:8",
+            "app_version_code" => "bail|required|integer"
+        ]);
+    
+        $customer_item_detail_data = Notification::where("notification_topic_or_receiver_phone", auth()->user()->user_phone)->orWhere('notification_topic_or_receiver_phone', "ALL_USERS")->orderBy('notification_id','desc')->take(50)->get();
+
+        return response([
+            "status" => "success", 
+            "message" => "Operation successful", 
+            "data" => $customer_item_detail_data
+        ]);
+    }
+
+
+    public function updateUserInfo(Request $request){
+        if (!Auth::guard('api')->check() || !$request->user()->tokenCan("use-mobile-apps-as-normal-user")) {
+            return response(["status" => "fail", "message" => "Permission Denied. Please log out and login again"]);
+        }
+
+        if (auth()->user()->user_flagged) {
+            $request->user()->token()->revoke();
+            return response(["status" => "fail", "message" => "Account access restricted"]);
+        }
+    
+        $validatedData = $request->validate([
+            "fcm_token" => "bail|required|max:1000",
+            "fcm_type" => "bail|required|max:7",
+            "app_type" => "bail|required|max:8",
+            "app_version_code" => "bail|required|integer"
+        ]);
+
+
+        $user1 = User::where('user_id', '=', auth()->user()->user_id)->first();
+
+        if($user1 === null){
+            return response([
+                "status" => "error", 
+                "message" => "User not found"
+            ]);
+        } else {
+            if($request->fcm_type == "ANDROID"){
+                $user1->user_notification_token_android = $request->fcm_token;
+                $user1->save();
+            } else if($request->fcm_type == "IPHONE"){
+                $user1->user_notification_token_ios = $request->fcm_token;
+                $user1->save();
+            } else {
+                return response([
+                    "status" => "error", 
+                    "message" => "FCM type unknown"
+                ]);
+            }
+        }
+
+        return response([
+            "status" => "success", 
+            "message" => "User Updated"
+        ]);
+    
     }
 
 

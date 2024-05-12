@@ -64,121 +64,97 @@ class UtilController extends Controller
     /*
     |--------------------------------------------------------------------------
     |--------------------------------------------------------------------------
-    | THIS FUNCTION VERIFIES A PAYMENT ON PAYSTACK
+    | THIS FUNCTION SENDS A NOTIFICATION TO A USER
     |--------------------------------------------------------------------------
     |--------------------------------------------------------------------------
     */
-
-    /*
-    public static function verifyPayStackPayment($reference)
-    {
-        $url = "https://api.paystack.co/transaction/verify/" . $reference;
-        $authorization =  "Authorization: Bearer " . config('app.paystacksecretkey');
-
-        $curl = curl_init();
-    
-        curl_setopt_array($curl, array(
-        CURLOPT_URL => $url,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => "",
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 30,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => "GET",
-        CURLOPT_HTTPHEADER => array(
-            $authorization,
-            "Cache-Control: no-cache",
-        ),
-        ));
-        
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-    
-        curl_close($curl);
-        $response = json_decode($response);
-        
-        if ($err) {
-            return response([
-                "status" => "error", 
-                "message" => "Failed to make request"
-            ]);
-        } else {
-            $transaction = Transaction::where('transaction_payment_ref_id', '=', $reference)->first();
-            if($transaction == null || empty($transaction->transaction_referenced_item_id)){
-                return response([
-                    "status" => "error", 
-                    "message" => "Failed to make request"
-                ]);
-            }
-            
-            //var_dump($response); exit;
-            if(!empty($response->data->status) && $response->data->status == "success"){
-                $transaction->transaction_payment_status = "verified_passed";
-                $transaction->save();  
-            }
- 
-
-        return  $response;
-        //echo $response;
+	public static function sendNotificationToUser($receiver_key, $priority, $title, $body){
+        if(empty($receiver_key)){
+            return false;
         }
-    }
-    */
+        $headers = array('Authorization:key=' . config("app.fcm_server_key"), 'Content-Type:application/json');
+        $fields = array(
+            'registration_ids' => array($receiver_key),
+            'priority' => $priority,
+            'notification' => array(
+                'title' => $title,
+                'body' => $body,
+                //'icon' => $message
+            )
+            );
 
-    /*
-    |--------------------------------------------------------------------------
-    |--------------------------------------------------------------------------
-    | THIS FUNCTION CREATES A PAYSTACK PAYMENT PLAN (NOT A SUBCRIPTION)
-    |--------------------------------------------------------------------------
-    |--------------------------------------------------------------------------
-    */
-    /*
-    public static function createPayStackPaymentPlan($plan_name, $plan_interval, $plan_benefits_description)
-    {
-        $url = "https://api.paystack.co/plan";
-        $authorization =  "Authorization: Bearer " . config('app.paystacksecretkey');
-
-        $curl = curl_init();
-
-        curl_setopt_array($curl, array(
-        CURLOPT_URL => $url,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => "",
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 30,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => "POST",
-        CURLOPT_POSTFIELDS => array(
-          "name" => "Monthly Retainer",
-          "interval" => "monthly",
-          "amount" => 500000
-        ),
-        CURLOPT_HTTPHEADER => array(
-            $authorization,
-            "Cache-Control: no-cache",
-        ),
-        ));
-        
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-
-        curl_close($curl);
-        $response = json_decode($response);
-        
-        if ($err) {
-            return response([
-                "status" => "error", 
-                "message" => "Failed to make request"
-            ]);
-        } else {
+            //var_dump($fields);
+            $payload = json_encode($fields);
+            $curl_session = \curl_init();
+            curl_setopt($curl_session, CURLOPT_URL, "https://fcm.googleapis.com/fcm/send");
+            curl_setopt($curl_session, CURLOPT_POST, true);
+            curl_setopt($curl_session, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($curl_session, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+            curl_setopt($curl_session, CURLOPT_POSTFIELDS, $payload);
+            $curl_result = curl_exec($curl_session);
+			
+			
+            /*
+            echo "\n\n\n";
+			echo $receiver_key;
+			echo "\n\n\n";
+			var_dump($curl_result);
+            */
             
-        //$planData["plan_id"] =  ;
-        $planData["plan_name"] = $plan_name;
-        $planData["plan_interval"] = $plan_interval;
-        $planData["plan_benefits_description"] = $plan_benefits_description;
-        //$plan = Plans::create($planData);
+			
+			return true;
 
-        return  $response;
-        }
-    }
-*/
+
+	} 
+
+    /*
+    |--------------------------------------------------------------------------
+    |--------------------------------------------------------------------------
+    | THIS FUNCTION SENDS A NOTIFICATION TO A TOPIC
+    |--------------------------------------------------------------------------
+    |--------------------------------------------------------------------------
+    */
+    public static function sendNotificationToTopic($topic, $priority, $title, $body){
+
+        if(!empty($topic)){
+			$headers = array('Authorization:key=' . config("app.fcm_server_key"), 'Content-Type:application/json');
+            $fields = array(
+                'to' => '/topics/'. $topic,
+                'priority' => $priority,
+                'notification' => array(
+                  'title' => $title,
+                  'body' => $body,
+                  //'icon' => $message
+                )
+                );
+
+			$payload = json_encode($fields);
+			$curl_session = \curl_init();
+			curl_setopt($curl_session, CURLOPT_URL, "https://fcm.googleapis.com/fcm/send");
+			curl_setopt($curl_session, CURLOPT_POST, true);
+			curl_setopt($curl_session, CURLOPT_HTTPHEADER, $headers);
+			curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, false);
+			curl_setopt($curl_session, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+			curl_setopt($curl_session, CURLOPT_POSTFIELDS, $payload);
+			$curl_result = curl_exec($curl_session);
+
+			/*
+            echo "\n\n\n";
+			var_dump($headers);
+            echo "\n\n\n";
+			var_dump($curl_result);
+            */
+            
+
+			return true;
+		} else {
+			return false;
+		}
+
+
+	} 
+
 }
