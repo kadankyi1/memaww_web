@@ -38,12 +38,21 @@ class UtilController extends Controller
 
     public static function getTimePassed($first, $second)
     {
-        $first  = new DateTime( $first );
-        $second = new DateTime( $second );
+        $dateTimeObject1 = date_create($first);  
+        $dateTimeObject2 = date_create($second);  
+            
+        // Calculating the difference between DateTime Objects 
+        $interval = date_diff($dateTimeObject1, $dateTimeObject2);  
+        //echo ("Difference in days is: "); 
         
-        $diff = $first->diff( $second );
-        
-        return $diff->format( '%I' );
+        // Printing the result in days format 
+        //echo $interval->format('%R%a days'); 
+        //echo "\n<br/>"; 
+        $min = $interval->days * 24 * 60; 
+        $min += $interval->h * 60; 
+        $min += $interval->i; 
+
+        return $min; // I is minutes
     }
 
 

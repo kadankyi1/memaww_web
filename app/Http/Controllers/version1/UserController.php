@@ -596,11 +596,12 @@ class UserController extends Controller
         $latest_callback_req = CollectionCallBackRequest::where("col_callback_req_user_id", auth()->user()->user_id)->orderBy('col_callback_req_id', 'DESC')->first();;
 
         if(!empty($latest_callback_req->created_at)){
-            intval(UtilController::getTimePassed(date("Y-m-d h:i:sa"), $latest_callback_req->created_at)) < 30;
-            return response([
-                "status" => "success", 
-                "message" => "Your previous callback request is in the works. You should receive a callback shortly"
-            ]);
+            if(intval(UtilController::getTimePassed(date("Y-m-d h:i:sa"), $latest_callback_req->created_at)) < 30){
+                return response([
+                    "status" => "success", 
+                    "message" => "Your previous callback request is in the works. You should receive a callback shortly"
+                ]);
+            }
         }
 
         $collectionRequestData["col_callback_req_user_id"] = auth()->user()->user_id;
