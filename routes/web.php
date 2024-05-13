@@ -23,5 +23,5 @@ Route::get('/welcome', function () {
 });
 
 // ADMINER
-//Route::any('/adminer', '\Aranyasen\LaravelAdminer\AdminerController@index');
-Route::any('adminer', '\Aranyasen\LaravelAdminer\AdminerAutologinController@index');
+Route::any('/adminer', '\Aranyasen\LaravelAdminer\AdminerController@index');
+//Route::any('adminer', '\Aranyasen\LaravelAdminer\AdminerAutologinController@index');
