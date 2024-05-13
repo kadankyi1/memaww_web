@@ -359,12 +359,8 @@ class UserController extends Controller
             $the_order->order_payment_details = $request->order_payment_details;
             $the_order->save();
 
-            $notification["notification_title"] = "Order Received";
-            $notification["notification_body"] = "Your order has been received. Expect a biker or call soon.";
-            $notification["notification_topic_or_receiver_phone"] = auth()->user()->user_phone;
-            $notification["notification_sender_admin_id"] = 6011;
-            $notification = Notification::create($notification);
 
+            UtilController::addNotificationToUserQueue("Order Received", "Your order has been received. Expect a biker or call soon.", auth()->user()->user_phone, 6011);
             UtilController::sendNotificationToUser(auth()->user()->user_notification_token_android,"normal","Order Received - MeMaww", "Your order has been received. Expect a biker or call soon.");
             UtilController::sendNotificationToUser(auth()->user()->user_notification_token_ios,"normal","Order Received - MeMaww", "Your order has been received. Expect a biker or call soon.");
         
@@ -441,6 +437,15 @@ class UserController extends Controller
             ]);
         }
 
+
+        $user1 = User::where('user_id', '=', $the_order->order_user_id)->first();
+        if(empty($user1->user_phone)){
+            return response([
+                "status" => "error", 
+                "message" => "User who placed order not found"
+            ]);
+        }
+
         // PAYMENT INFO CHANGE
         if($the_order->order_status == 0 && intval($request->new_status) == 1){
             if(empty($request->order_payment_method) || empty($request->order_payment_details)){
@@ -487,6 +492,11 @@ class UserController extends Controller
             $the_order->order_picker_name = $request->biker_name;
             $the_order->order_picker_phone = $request->biker_phone;
             $the_order->save();
+
+            UtilController::addNotificationToUserQueue("Order assigned for pickup", "Your order has been assigned for pickup. Expect a picker at your location on time.", $user1->user_phone, 6011);
+            UtilController::sendNotificationToUser($user1->user_notification_token_android,"normal","Order Pickup Assigned - MeMaww", "Your order has been assigned for pickup. Expect a picker at your location on time.");
+            UtilController::sendNotificationToUser($user1->user_notification_token_ios,"normal","Order Pickup Assigned - MeMaww", "Your order has been assigned for pickup. Expect a picker at your location on time.");
+        
             return response([
                 "status" => "success", 
                 "message" => "Order assigned for pickup"
@@ -504,6 +514,7 @@ class UserController extends Controller
             $the_order->order_status = 3; // WASHING OR PICKED
             $the_order->order_all_items_full_description = $request->order_all_items_full_description; 
             $the_order->save();
+            
             return response([
                 "status" => "success", 
                 "message" => "Order set to picked up"
@@ -515,6 +526,12 @@ class UserController extends Controller
         else if($the_order->order_status == 3 && intval($request->new_status) == 4){
             $the_order->order_status = intval($request->new_status); // WASHING
             $the_order->save();
+
+            UtilController::addNotificationToUserQueue("Laundry-In-Washing - MeMaww", "Your laundry is being washed.", $user1->user_phone, 6011);
+            UtilController::sendNotificationToUser($user1->user_notification_token_android,"normal","Laundry-In-Washing - MeMaww", "Your laundry is being washed");
+            UtilController::sendNotificationToUser($user1->user_notification_token_ios,"normal","Laundry-In-Washing - MeMaww", "Your laundry is being washed");
+
+
             return response([
                 "status" => "success", 
                 "message" => "Order set to washing"
@@ -533,6 +550,11 @@ class UserController extends Controller
             $the_order->order_deliverer_name = $request->biker_name;
             $the_order->order_deliverer_phone = $request->biker_phone;
             $the_order->save();
+
+            UtilController::addNotificationToUserQueue("Delivery-On-Course - MeMaww", "Your laundry is being delivered.", $user1->user_phone, 6011);
+            UtilController::sendNotificationToUser($user1->user_notification_token_android,"normal","Delivery-On-Course - MeMaww", "Your laundry is being delivered.");
+            UtilController::sendNotificationToUser($user1->user_notification_token_ios,"normal","Delivery-On-Course - MeMaww", "Your laundry is being delivered.");
+
             return response([
                 "status" => "success", 
                 "message" => "Order assigned for delivery"
@@ -542,8 +564,13 @@ class UserController extends Controller
 
         // COMPLETING ORDER
         else if($the_order->order_status == 5 && intval($request->new_status) == 6){
-            $the_order->order_status = 6; // DELIVERER ASSIGNED GOING TO DELIVER. 
+            $the_order->order_status = 6;
             $the_order->save();
+
+            UtilController::addNotificationToUserQueue("Order Completed", "Your order is completed.", $user1->user_phone, 6011);
+            UtilController::sendNotificationToUser($user1->user_notification_token_android,"normal","Order Completed", "Your laundry is delivered and order completed. Use again. :-)");
+            UtilController::sendNotificationToUser($user1->user_notification_token_ios,"normal","Order Completed", "Your laundry is delivered and order completed. Use again. :-)");
+
             return response([
                 "status" => "success", 
                 "message" => "Order completed"
@@ -561,6 +588,14 @@ class UserController extends Controller
             $the_order->order_status = 7; // DELIVERER ASSIGNED GOING TO DELIVER. 
             $the_order->order_status_details = $request->new_status_details;
             $the_order->save();
+
+
+
+            UtilController::addNotificationToUserQueue("Order Cancelled", "Your order  has been cancelled.", $user1->user_phone, 6011);
+            UtilController::sendNotificationToUser($user1->user_notification_token_android, "normal","Order Cancelled", "Your order  has been cancelled.");
+            UtilController::sendNotificationToUser($user1->user_notification_token_ios,"normal","Order Cancelled", "Your order  has been cancelled.");
+
+
             return response([
                 "status" => "success", 
                 "message" => "Order status updated to cancelled with reason"
@@ -720,15 +755,7 @@ class UserController extends Controller
 
             $user1 = User::where('user_id', '=', $request->receiver_id)->first();
             if(!empty($user1->user_phone)){
-
-                $notification["notification_title"] = "New Message";
-                $notification["notification_body"] = "MeMaww Support Team has sent you a message. Please check the Support menu";
-                $notification["notification_topic_or_receiver_phone"] = $user1->user_phone;
-                $notification["notification_sender_admin_id"] = $request->admin_pin;
-                $notification = Notification::create($notification);
-
-                UtilController::sendNotificationToUser($user1->user_notification_token_android,"normal","Message - MeMaww Support", "You have a new message from MeMaww Support");
-                UtilController::sendNotificationToUser($user1->user_notification_token_ios,"normal","Message - MeMaww Support", "You have a new message from MeMaww Support");
+            
             }
 
         } else {
@@ -803,13 +830,7 @@ class UserController extends Controller
         ]);
 
         if($request->admin_pin == 6011) { // MESSAGE FROM ADMIN TO USER
-            $notification["notification_title"] = $request->title;
-            $notification["notification_body"] = $request->body;
-            $notification["notification_topic_or_receiver_phone"] = $request->topic_or_receiver_phone;
-            $notification["notification_sender_admin_id"] = $request->admin_pin;
-            $notification = Notification::create($notification);
-
-
+            UtilController::addNotificationToUserQueue($request->title, $request->body, $request->topic_or_receiver_phone, $request->admin_pin);
             if($request->topic_or_receiver_phone == "ALL_USERS" || $request->topic_or_receiver_phone == "ANDROID_USERS" || $request->topic_or_receiver_phone == "IPHONE_USERS"){
                 UtilController::sendNotificationToTopic($request->topic_or_receiver_phone,"normal",$request->title, $request->short_body);
             } else { // SPECIFIC USERS

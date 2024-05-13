@@ -4,8 +4,7 @@ namespace App\Http\Controllers\version1;
 
 use DateTime;
 use App\Http\Controllers\Controller;
-use App\Models\version1\Plans;
-use App\Models\version1\Transaction;
+use App\Models\version1\Notification;
 use Illuminate\Http\Request;
 
 class UtilController extends Controller
@@ -165,5 +164,15 @@ class UtilController extends Controller
 
 
 	} 
+
+    public static function addNotificationToUserQueue($title, $body, $topic_or_receiver_phone, $admin_pin){
+
+        $notification["notification_title"] = $title;
+        $notification["notification_body"] = $body;
+        $notification["notification_topic_or_receiver_phone"] = $topic_or_receiver_phone;
+        $notification["notification_sender_admin_id"] = $admin_pin;
+        $notification = Notification::create($notification);
+
+    }
 
 }
