@@ -352,7 +352,7 @@ class UserController extends Controller
             ]);
         }
 
-        if($request->order_payment_status == "approved" || $request->order_payment_status == "pay_on_delivery"){
+        if($request->order_payment_status == "approved" || $request->order_payment_status == "pay_on_pickup"){
             $the_order->order_status = 1;
             $the_order->order_payment_method = $request->order_payment_method;
             $the_order->order_payment_status = $request->order_payment_status == "approved" ? 1 : 0;
