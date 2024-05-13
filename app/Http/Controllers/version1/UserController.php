@@ -270,7 +270,7 @@ class UserController extends Controller
         $orderData["order_dropoff_location_gps"] = $validatedData["collect_loc_gps"];
         $orderData["order_dropoff_date"] = $validatedData["drop_datetime"];
         $orderData["order_dropoff_contact_person_phone"] = $validatedData["contact_person_phone"];
-        $orderData["special_instructions"] = $validatedData["special_instructions"];
+        $orderData["special_instructions"] = empty($validatedData["special_instructions"]) ? "" : $validatedData["special_instructions"];
 
         $orderData["order_country_id"] = auth()->user()->user_country_id;
         $orderData["order_user_countrys_currency"] = $userCountry->country_currency_symbol;
