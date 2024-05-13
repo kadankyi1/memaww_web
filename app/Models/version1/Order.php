@@ -16,7 +16,7 @@ class Order extends Model
     //define accessor
     public function getAllItemsAttribute()
     {
-        return strval($this->order_lightweightitems_just_wash_quantity + $this->order_lightweightitems_wash_and_iron_quantity + $this->order_bulkyitems_just_wash_quantity + $this->order_bulkyitems_wash_and_iron_quantity);
+        return strval($this->order_lightweightitems_just_wash_quantity + $this->order_lightweightitems_wash_and_iron_quantity + $this->order_lightweightitems_just_iron_quantity + $this->order_bulkyitems_just_wash_quantity + $this->order_bulkyitems_wash_and_iron_quantity);
 
     }
     //define accessor
@@ -103,6 +103,7 @@ class Order extends Model
         'order_dropoff_biker_name',
         'order_lightweightitems_just_wash_quantity',
         'order_lightweightitems_wash_and_iron_quantity',
+        'order_lightweightitems_just_iron_quantity',
         'order_bulkyitems_just_wash_quantity',
         'order_bulkyitems_wash_and_iron_quantity',
         'order_all_items_full_description',

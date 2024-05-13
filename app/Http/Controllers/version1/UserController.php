@@ -6,6 +6,7 @@ namespace App\Http\Controllers\version1;
 use App\Models\version1\User;
 use App\Http\Controllers\Controller;
 use App\Mail\version1\GeneralMailToAdmin;
+use App\Mail\version1\NewOrderMailToAdmin;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\version1\RequestCollectionCallbackMailToAdmin;
 use App\Models\version1\CollectionCallBack;
@@ -283,6 +284,7 @@ class UserController extends Controller
         //$orderData["order_dropoff_biker_name"] = "";
         $orderData["order_lightweightitems_just_wash_quantity"] = $validatedData["smallitems_justwash_quantity"];
         $orderData["order_lightweightitems_wash_and_iron_quantity"] = $validatedData["smallitems_washandiron_quantity"];
+        $orderData["order_lightweightitems_just_iron_quantity"] = $validatedData["smallitems_justiron_quantity"];
         $orderData["order_bulkyitems_just_wash_quantity"] = $validatedData["bigitems_justwash_quantity"];
         $orderData["order_bulkyitems_wash_and_iron_quantity"] = $validatedData["bigitems_washandiron_quantity"];
         $orderData["order_status"] = 0; //0=pending_user_confirmation, 1=pending_payment, 2-payment_made_pending_collector_assignment, 3-Collected, 4-Washing, 5-assigned_for_delivery, 6-completed
@@ -350,12 +352,45 @@ class UserController extends Controller
             ]);
         }
 
-        if($request->order_payment_status == "approved"){
+        if($request->order_payment_status == "approved" || $request->order_payment_status == "pay_on_delivery"){
             $the_order->order_status = 1;
             $the_order->order_payment_method = $request->order_payment_method;
-            $the_order->order_payment_status = 1;
+            $the_order->order_payment_status = $request->order_payment_status == "approved" ? 1 : 0;
             $the_order->order_payment_details = $request->order_payment_details;
             $the_order->save();
+
+            $notification["notification_title"] = "Order Received";
+            $notification["notification_body"] = "Your order has been received. Expect a biker or call soon.";
+            $notification["notification_topic_or_receiver_phone"] = auth()->user()->user_phone;
+            $notification["notification_sender_admin_id"] = 6011;
+            $notification = Notification::create($notification);
+
+            UtilController::sendNotificationToUser(auth()->user()->user_notification_token_android,"normal","Order Received - MeMaww", "Your order has been received. Expect a biker or call soon.");
+            UtilController::sendNotificationToUser(auth()->user()->user_notification_token_ios,"normal","Order Received - MeMaww", "Your order has been received. Expect a biker or call soon.");
+        
+            $email_data = array(
+                'pickup_time' => "Time: " . $the_order->order_collection_date,
+                'pickup_location_raw' => $the_order->order_collection_location_raw,
+                'pickup_location_gps' => $the_order->order_collection_location_gps,
+                'user_name' => auth()->user()->user_first_name . " " . auth()->user()->user_last_name,
+                'user_phone' => auth()->user()->user_phone,
+                'order_status' => $the_order->order_status,
+                'order_time' => $the_order->created_at,
+                'order_payment_amt' => $the_order->order_user_countrys_currency . $the_order->order_final_price_in_user_countrys_currency,
+                'order_payment_status' => $the_order->order_payment_status,
+                'order_lightweightitems_just_wash_quantity' => $the_order->order_lightweightitems_just_wash_quantity,
+                'order_lightweightitems_wash_and_iron_quantity' => $the_order->order_lightweightitems_wash_and_iron_quantity,
+                'order_lightweightitems_just_iron_quantity' => $the_order->order_lightweightitems_just_iron_quantity,
+                'order_bulkyitems_just_wash_quantity' => $the_order->order_bulkyitems_just_wash_quantity,
+                'order_bulkyitems_wash_and_iron_quantity' => $the_order->order_bulkyitems_wash_and_iron_quantity,
+                'order_total_lightweight_items' => $the_order->order_lightweightitems_just_wash_quantity + $the_order->order_lightweightitems_wash_and_iron_quantity + $the_order->order_lightweightitems_just_iron_quantity,
+                'order_total_bulkyweight_items' => $the_order->order_bulkyitems_just_wash_quantity + $the_order->order_bulkyitems_wash_and_iron_quantity,
+                'order_total_items' => $the_order->order_lightweightitems_just_wash_quantity + $the_order->order_lightweightitems_wash_and_iron_quantity + $the_order->order_lightweightitems_just_iron_quantity + $the_order->order_bulkyitems_just_wash_quantity + $the_order->order_bulkyitems_wash_and_iron_quantity,
+                'time' => date("F j, Y, g:i a")
+            );
+            Mail::to(config('app.supportemail'))->send(new NewOrderMailToAdmin($email_data));
+    
+
             return response([
                 "status" => "success", 
                 "message" => "Order updated"
