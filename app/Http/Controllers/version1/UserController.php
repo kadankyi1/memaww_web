@@ -713,7 +713,8 @@ class UserController extends Controller
             "app_version_code" => "bail|required|integer"
         ]);
     
-        $customer_item_detail_data = Order::where("order_user_id", auth()->user()->user_id)->orderBy('order_id','desc')->get();
+        //$customer_item_detail_data = Order::where("order_user_id", auth()->user()->user_id)->orderBy('order_id','desc')->get();
+        $customer_item_detail_data = Order::where("order_user_id", auth()->user()->user_id)->whereNot('order_status','<=>',0)->orderBy('order_id','desc')->get();
 
         return response([
             "status" => "success", 
