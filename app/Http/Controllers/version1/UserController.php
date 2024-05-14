@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\version1;
 
 
+use DateTime;
 use App\Models\version1\User;
 use App\Http\Controllers\Controller;
 use App\Mail\version1\GeneralMailToAdmin;
@@ -157,29 +158,31 @@ class UserController extends Controller
         $validatedData = $request->validate([
             "collect_loc_raw" => "bail|max:100",
             "collect_loc_gps" => "bail|max:20",
-            "collect_datetime" => "bail|required|date_format:H:i",
-            "contact_person_phone" => "bail|required|max:10",
+            "collect_datetime" => "bail|max:5",
+            "contact_person_phone" => "bail|max:10",
             "drop_loc_raw" => "bail|max:100",
             "drop_loc_gps" => "bail|max:20",
             "drop_datetime" => "bail|max:12",
-            "smallitems_justwash_quantity" => "bail|required|integer|digits_between:-1,1000",
-            "smallitems_washandiron_quantity" => "bail|required|integer|digits_between:-1,1000",
-            "smallitems_justiron_quantity" => "bail|required|integer|digits_between:-1,1000",
-            "bigitems_justwash_quantity" => "bail|required|integer|digits_between:-1,1000",
-            "bigitems_washandiron_quantity" => "bail|required|integer|digits_between:-1,1000",
+            "smallitems_justwash_quantity" => "bail|integer|digits_between:-1,1000",
+            "smallitems_washandiron_quantity" => "bail|integer|digits_between:-1,1000",
+            "smallitems_justiron_quantity" => "bail|integer|digits_between:-1,1000",
+            "bigitems_justwash_quantity" => "bail|integer|digits_between:-1,1000",
+            "bigitems_washandiron_quantity" => "bail|integer|digits_between:-1,1000",
             "special_instructions" => "bail|max:2000",
             "discount_code" => "bail|max:12",
             "app_type" => "bail|required|max:8",
             "app_version_code" => "bail|required|integer"
         ]);
-        
-        if($request->collect_loc_raw && $request->collect_loc_raw){
-            return response(["status" => "error", "message" => "Fill in the pick location"]);
-        }
-        if($request->collect_loc_raw && $request->collect_loc_raw){
+
+        if (empty($request->collect_datetime) || DateTime::createFromFormat('Y-m-d H:i:s', date("Y-m-d") . " " . $request->collect_datetime . ":00") === false) {
             return response(["status" => "error", "message" => "Fill in the pickup time"]);
         }
-        if($request->contact_person_phone){
+
+        if(empty($request->collect_loc_raw) && empty($request->collect_loc_gps)){
+            return response(["status" => "error", "message" => "Fill in the pickup location"]);
+        }
+
+        if(empty($request->contact_person_phone)){
             return response(["status" => "error", "message" => "Fill in contact person's phone number"]);
         }
 
@@ -681,7 +684,7 @@ class UserController extends Controller
         $latest_callback_req = CollectionCallBackRequest::where("col_callback_req_user_id", auth()->user()->user_id)->orderBy('col_callback_req_id', 'DESC')->first();;
 
         if(!empty($latest_callback_req->created_at)){
-            if(intval(UtilController::getTimePassed(date("Y-m-d h:i:sa"), $latest_callback_req->created_at)) < 30){
+            if(intval(UtilController::getTimePassed(date("Y-m-d H:i:s"), $latest_callback_req->created_at)) < 30){
                 return response([
                     "status" => "success", 
                     "message" => "Your previous callback request is in the works. You should receive a callback shortly"
@@ -775,6 +778,27 @@ class UserController extends Controller
             }
 
         } else {
+
+            $last_3_messages_data = Message::where("message_sender_user_id", auth()->user()->user_id)->orWhere('message_receiver_id', auth()->user()->user_id)->orderBy('message_id','desc')->take(3)->get();
+
+            if(
+                count($last_3_messages_data) == 3
+                && 
+                (
+                $last_3_messages_data[0]->message_sender_user_id === auth()->user()->user_id 
+                && $last_3_messages_data[1]->message_sender_user_id === auth()->user()->user_id
+                && $last_3_messages_data[2]->message_sender_user_id === auth()->user()->user_id
+                )
+                && intval(UtilController::getTimePassed($last_3_messages_data[0]->created_at, date("Y-m-d H:i:s"))) < 30
+            ){
+
+                return response([
+                    "status" => "error", 
+                    "message" => "Please wait for a response or try sending your message 30mins time later. You can also call us on +233535065535"
+                ]);
+            }
+            
+
             $message["message_text"] = $request->message;
             $message["message_sender_user_id"] = auth()->user()->user_id;
             $message["message_receiver_id"] = 1;
