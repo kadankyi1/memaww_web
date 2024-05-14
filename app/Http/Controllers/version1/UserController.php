@@ -155,7 +155,7 @@ class UserController extends Controller
         }
     
         $validatedData = $request->validate([
-            "collect_loc_raw" => "bail|required|max:100",
+            "collect_loc_raw" => "bail|max:100",
             "collect_loc_gps" => "bail|max:20",
             "collect_datetime" => "bail|required|date_format:H:i",
             "contact_person_phone" => "bail|required|max:10",
@@ -172,6 +172,21 @@ class UserController extends Controller
             "app_type" => "bail|required|max:8",
             "app_version_code" => "bail|required|integer"
         ]);
+        
+        if($request->collect_loc_raw && $request->collect_loc_raw){
+            return response(["status" => "error", "message" => "Fill in the pick location"]);
+        }
+        if($request->collect_loc_raw && $request->collect_loc_raw){
+            return response(["status" => "error", "message" => "Fill in the pickup time"]);
+        }
+        if($request->contact_person_phone){
+            return response(["status" => "error", "message" => "Fill in contact person's phone number"]);
+        }
+
+        if(($request->smallitems_justwash_quantity + $request->smallitems_washandiron_quantity + $request->smallitems_justiron_quantity + $request->bigitems_justwash_quantity + $request->bigitems_washandiron_quantity) <= 0)
+        {
+            return response(["status" => "error", "message" => "You have not set the number of items we are picking up."]);
+        }
         
         $final_price = 0;
         $pay_online = "yes";
