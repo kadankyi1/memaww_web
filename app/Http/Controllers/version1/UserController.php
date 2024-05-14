@@ -774,7 +774,11 @@ class UserController extends Controller
 
             $user1 = User::where('user_id', '=', $request->receiver_id)->first();
             if(!empty($user1->user_phone)){
-            
+
+                UtilController::addNotificationToUserQueue("New Message - MeMaww", "You have a response from MeMaww Support", $user1->user_phone, 6011);
+                UtilController::sendNotificationToUser($user1->user_notification_token_android, "normal","New Message - MeMaww", "You have a response from MeMaww Support");
+                UtilController::sendNotificationToUser($user1->user_notification_token_ios,"normal","New Message - MeMaww", "You have a response from MeMaww Support");
+    
             }
 
         } else {
