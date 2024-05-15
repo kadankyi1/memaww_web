@@ -19,7 +19,8 @@ class Order extends Model
         'order_id_string', 
         'order_user_id_string', 
         'order_id_long', 
-        'order_delivery_date'
+        'order_delivery_date', 
+        'order_delivery_status_number'
     ];
 
     //define accessor
@@ -58,7 +59,7 @@ class Order extends Model
         } else if($this->order_status == 5){
             return $this->order_deliverer_name . " has been assigned to deliver your laundry. Call them on " . $this->order_deliverer_phone;
         } else if($this->order_status == 6){
-            return "Order completed. We hope you enjoyed the service";
+            return "Order completed. We hope we served you well. Contact us if you have any issues";
         } else if($this->order_status == 7){
             return "We had to cancel your order. If this was an error, start a new order or contact us";
         } else {
@@ -92,6 +93,38 @@ class Order extends Model
     {
         return empty($this->order_dropoff_date) == true ? "Pending" : date('F j, g:i a',strtotime($this->created_at));
         //return $this->created_at->diffForHumans;
+    }
+    
+    public function getOrderDeliveryStatusNumberAttribute()
+    {
+        //0=pending Payment, 
+        //1=Pending Pickup Assignment, 
+        //2-Assigned For Pickup, 
+        //3-Picked up, 
+        //4-Washing,
+        //5-Assigned For Delivery, 
+        //6-completed,
+        //7-Payment failed
+        
+        if($this->order_status == 0){
+            return 1;
+        } else if($this->order_status == 1){
+            return 1;
+        } else if($this->order_status == 2){
+            return 1;
+        } else if($this->order_status == 3){
+            return 2;
+        } else if($this->order_status == 4){
+            return 3;
+        } else if($this->order_status == 5){
+            return 3;
+        } else if($this->order_status == 6){
+            return 4;
+        } else if($this->order_status == 7){
+            return 4;
+        } else {
+            return 0;
+        }
     }
 
     /**
