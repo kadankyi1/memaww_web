@@ -11,7 +11,16 @@ use Illuminate\Notifications\Notifiable;
 class Order extends Model
 {    
     use HasFactory;
-    protected $appends = ['all_items', 'order_date', 'order_status_message', 'order_final_amt_with_currency', 'order_id_string', 'order_user_id_string'];
+    protected $appends = [
+        'all_items', 
+        'order_date', 
+        'order_status_message', 
+        'order_final_amt_with_currency', 
+        'order_id_string', 
+        'order_user_id_string', 
+        'order_id_long', 
+        'order_delivery_date'
+    ];
 
     //define accessor
     public function getAllItemsAttribute()
@@ -22,8 +31,8 @@ class Order extends Model
     //define accessor
     public function getOrderDateAttribute()
     {
-        return date('M j',strtotime($this->created_at));
-
+        return date('F j, g:i a',strtotime($this->created_at));
+        //return $this->created_at->diffForHumans;
     }
 
     public function getOrderStatusMessageAttribute()
@@ -37,23 +46,23 @@ class Order extends Model
         //6-completed,
         //7-Payment failed
         if($this->order_status == 0){
-            return "Pending Payment";
+            return "Your order is pending Payment";
         } else if($this->order_status == 1){
-            return "Pending Pickup Assignment";
+            return "We are yet to assign someone to pickup your laundry";
         } else if($this->order_status == 2){
-            return "Assigned For Pickup";
+            return $this->order_picker_name . " has been assigned to pickup your laundry. Call them on " . $this->order_picker_phone;
         } else if($this->order_status == 3){
-            return "Picked Up";
+            return "Your laundry has been picked up";
         } else if($this->order_status == 4){
-            return "Washing";
+            return "Your laundry is being washed and packed";
         } else if($this->order_status == 5){
-            return "Assigned For Delivery";
+            return $this->order_deliverer_name . " has been assigned to deliver your laundry. Call them on " . $this->order_deliverer_phone;
         } else if($this->order_status == 6){
-            return "Completed";
+            return "Order completed. We hope you enjoyed the service";
         } else if($this->order_status == 7){
-            return "Cancelled";
+            return "We had to cancel your order. If this was an error, start a new order or contact us";
         } else {
-            return "Unknown";
+            return "We don't seem to know what is happening with your order";
         }
     }
 
@@ -71,6 +80,18 @@ class Order extends Model
     public function getOrderIdStringAttribute()
     {
         return strval($this->order_id);
+    }
+
+    public function getOrderIdLongAttribute()
+    {
+        return "#" . sprintf("%06d", $this->order_id);
+    }
+
+
+    public function getOrderDeliveryDateAttribute()
+    {
+        return empty($this->order_dropoff_date) == true ? "Pending" : date('F j, g:i a',strtotime($this->created_at));
+        //return $this->created_at->diffForHumans;
     }
 
     /**

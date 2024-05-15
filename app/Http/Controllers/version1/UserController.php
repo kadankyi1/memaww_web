@@ -433,6 +433,7 @@ class UserController extends Controller
         $validatedData = $request->validate([
             "order_id" => "bail|required|max:100",
             "new_status" => "bail|required|max:100",
+            "order_delivery_date" => "bail|max:100",
             "new_status_details" => "bail|max:200",
             "order_payment_status" => "bail|max:100",
             "order_payment_details" => "bail|max:200",
@@ -582,6 +583,13 @@ class UserController extends Controller
 
         // COMPLETING ORDER
         else if($the_order->order_status == 5 && intval($request->new_status) == 6){
+            if(empty($request->order_delivery_date) || !UtilController::validateDate($request->order_delivery_date, 'Y-m-d H:i:s')){
+                return response([
+                    "status" => "error", 
+                    "message" => "Make sure to fill in the order delivery date in the format " .  date('Y-m-d H:i:s'),
+                ]);
+            }
+            $the_order->order_dropoff_date = $request->order_delivery_date;
             $the_order->order_status = 6;
             $the_order->save();
 
