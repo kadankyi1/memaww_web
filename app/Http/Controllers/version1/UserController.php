@@ -616,7 +616,6 @@ class UserController extends Controller
             $the_order->save();
 
 
-
             UtilController::addNotificationToUserQueue("Order Cancelled", "Your order  has been cancelled.", $user1->user_phone, 6011);
             UtilController::sendNotificationToUser($user1->user_notification_token_android, "normal","Order Cancelled", "Your order  has been cancelled.");
             UtilController::sendNotificationToUser($user1->user_notification_token_ios,"normal","Order Cancelled", "Your order  has been cancelled.");
@@ -960,23 +959,47 @@ class UserController extends Controller
                 "status" => "error", 
                 "message" => "User not found"
             ]);
+        }
+
+        if($request->fcm_type == "ANDROID"){
+            $user1->user_notification_token_android = $request->fcm_token;
+            $user1->save();
+        } else if($request->fcm_type == "IPHONE"){
+            $user1->user_notification_token_ios = $request->fcm_token;
+            $user1->save();
         } else {
-            if($request->fcm_type == "ANDROID"){
-                $user1->user_notification_token_android = $request->fcm_token;
-                $user1->save();
-            } else if($request->fcm_type == "IPHONE"){
-                $user1->user_notification_token_ios = $request->fcm_token;
-                $user1->save();
-            } else {
-                return response([
-                    "status" => "error", 
-                    "message" => "FCM type unknown"
-                ]);
-            }
+            return response([
+                "status" => "error", 
+                "message" => "FCM type unknown"
+            ]);
+        }
+
+        if(
+            strtoupper($request->app_type) == "ANDROID" 
+            &&  $request->app_version_code < intval(config('app.androidminvc'))
+        ){
+            return response([
+                "status" => "success", 
+                "force_update" => true,
+                "min_vc" => config('app.androidminvc'), 
+                "message" => "Please update your app from the Google Play Store."
+            ]);
+        }
+
+        if(strtoupper($request->app_type) == "IOS" && 
+        $request->app_version_code < intval(config('app.iosminvc'))
+        ){
+            return response([
+            "status" => "error", 
+            "force_update" => true,
+            "min_vc" => config('app.iosminvc'), 
+            "message" => "Please update your app from the Apple App Store."
+            ]);
         }
 
         return response([
             "status" => "success", 
+            "force_update" => false,
             "message" => "User Updated"
         ]);
     
