@@ -974,34 +974,25 @@ class UserController extends Controller
             ]);
         }
 
-        if(
-            strtoupper($request->app_type) == "ANDROID" 
-            &&  $request->app_version_code < intval(config('app.androidminvc'))
-        ){
+        if(strtoupper($request->app_type) == "ANDROID"){
             return response([
                 "status" => "success", 
-                "force_update" => true,
                 "min_vc" => config('app.androidminvc'), 
                 "message" => "Please update your app from the Google Play Store."
             ]);
-        }
-
-        if(strtoupper($request->app_type) == "IOS" && 
-        $request->app_version_code < intval(config('app.iosminvc'))
-        ){
+        } else if(strtoupper($request->app_type) == "IOS"){
             return response([
             "status" => "error", 
-            "force_update" => true,
             "min_vc" => config('app.iosminvc'), 
             "message" => "Please update your app from the Apple App Store."
             ]);
+        } else {
+            return response([
+                "status" => "error", 
+                "message" => "Device unknown"
+            ]);
         }
 
-        return response([
-            "status" => "success", 
-            "force_update" => false,
-            "message" => "User Updated"
-        ]);
     
     }
 
