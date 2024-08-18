@@ -22,6 +22,11 @@ Route::get('/welcome', function () {
     return view('welcome');
 });
 
+
+Route::get('/order-payment-update', function () {
+    return view('update-order-payment');
+});
+
 // ADMINER
 //Route::any('/adminer', '\Aranyasen\LaravelAdminer\AdminerController@index');
 Route::any('adminer', '\Aranyasen\LaravelAdminer\AdminerAutologinController@index');

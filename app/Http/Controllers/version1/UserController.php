@@ -421,12 +421,14 @@ class UserController extends Controller
             "discount_amount" => $userCountry->country_currency_symbol . strval($discount_amount), 
             "price_final" => $userCountry->country_currency_symbol . strval($final_price), 
             "price_final_no_currency" => strval($final_price), 
+            "price_final_no_currency_long" => sprintf("%012d", strval($final_price)), 
             "user_email" => auth()->user()->user_phone . "@memaww.com", 
             "txn_narration" => "Laundry pickup request by " . auth()->user()->user_last_name . " " . auth()->user()->user_first_name, 
             "txn_reference" => sprintf("%012d", $order->order_id), 
             "merchant_id" => config('app.payment_gateway_merchant_id'), 
             "merchant_api_user" => config('app.payment_gateway_merchant_api_user'), 
             "merchant_api_key" => config('app.payment_gateway_merchant_api_key'), 
+            "merchant_test_api_key" => config('app.payment_gateway_merchant_test_api_key'), 
             "return_url" => config('app.url') . "/payment/" . $order->order_sys_id, 
             "message" => "Order created"
         ]);
@@ -892,6 +894,7 @@ class UserController extends Controller
 
             $last_3_messages_data = Message::where("message_sender_user_id", auth()->user()->user_id)->orWhere('message_receiver_id', auth()->user()->user_id)->orderBy('message_id','desc')->take(3)->get();
 
+            /*
             if(
                 count($last_3_messages_data) == 3
                 && 
@@ -908,6 +911,7 @@ class UserController extends Controller
                     "message" => "Please wait for a response or try sending your message 30mins time later. You can also call us on +233535065535"
                 ]);
             }
+            */
             
 
             $message["message_text"] = $request->message;
@@ -927,7 +931,8 @@ class UserController extends Controller
 
         return response([
             "status" => "success", 
-            "message" => "Message sent"
+            "message" => "Message sent", 
+            "data" => $message
         ]);
     
     }
@@ -951,7 +956,7 @@ class UserController extends Controller
             "app_version_code" => "bail|required|integer"
         ]);
     
-        $customer_item_detail_data = Message::where("message_sender_user_id", auth()->user()->user_id)->orWhere('message_receiver_id', auth()->user()->user_id)->orderBy('message_id','asc')->take(50)->get();
+        $customer_item_detail_data = Message::where("message_sender_user_id", auth()->user()->user_id)->orWhere('message_receiver_id', auth()->user()->user_id)->orderBy('message_id','desc')->take(71)->get();
 
         return response([
             "status" => "success", 

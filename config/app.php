@@ -11,6 +11,7 @@ return [
     'payment_gateway_merchant_id' => env('PAYMENT_GATEWAY_MERCHANT_ID', ''),
     'payment_gateway_merchant_api_user' => env('PAYMENT_GATEWAY_MERCHANT_API_USER', ''),
     'payment_gateway_merchant_api_key' => env('PAYMENT_GATEWAY_MERCHANT_API_KEY', ''),
+    'payment_gateway_merchant_test_api_key' => env('PAYMENT_GATEWAY_MERCHANT_TEST_API_KEY', ''),
 
 
     /*
