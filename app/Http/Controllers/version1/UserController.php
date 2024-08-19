@@ -173,6 +173,7 @@ class UserController extends Controller
             "app_type" => "bail|required|max:8",
             "app_version_code" => "bail|required|integer"
         ]);
+        
 
         if (empty($request->collect_datetime) || DateTime::createFromFormat('Y-m-d H:i:s', date("Y-m-d") . " " . $request->collect_datetime . ":00") === false) {
             return response(["status" => "error", "message" => "Fill in the pickup time"]);
@@ -377,6 +378,7 @@ class UserController extends Controller
                 "message" => "Service not available in your country."
             ]);
         }
+        
         $orderData["order_sys_id"] = auth()->user()->user_id . "_" .date("YmdHis") . UtilController::getRandomString(4);
         $orderData["order_user_id"] = auth()->user()->user_id;
         $orderData["order_laundrysp_id"] = 1; // MeMaww Ghana
