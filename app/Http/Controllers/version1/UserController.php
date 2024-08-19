@@ -157,11 +157,11 @@ class UserController extends Controller
     
         $validatedData = $request->validate([
             "collect_loc_raw" => "bail|max:100",
-            "collect_loc_gps" => "bail|max:20",
+            "collect_loc_gps" => "bail|max:22",
             "collect_datetime" => "bail|max:5",
             "contact_person_phone" => "bail|max:10",
             "drop_loc_raw" => "bail|max:100",
-            "drop_loc_gps" => "bail|max:20",
+            "drop_loc_gps" => "bail|max:22",
             "drop_datetime" => "bail|max:12",
             "smallitems_justwash_quantity" => "bail|integer|digits_between:-1,1000",
             "smallitems_washandiron_quantity" => "bail|integer|digits_between:-1,1000",
@@ -926,7 +926,7 @@ class UserController extends Controller
                 'user_phone' => auth()->user()->user_phone,
                 'time' => date("F j, Y, g:i a")
             );
-            Mail::to(config('app.supportemail'))->send(new GeneralMailToAdmin($email_data));
+            //Mail::to(config('app.supportemail'))->send(new GeneralMailToAdmin($email_data));
         }
 
         return response([
