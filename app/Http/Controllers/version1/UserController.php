@@ -122,6 +122,17 @@ class UserController extends Controller
                 $userData["user_ios_app_version_code"] = $validatedData["app_version_code"];
             } 
             $user1 = User::create($userData);
+
+            if(!empty($request->invite_code)){
+                //echo "1 here \n <br> \n ";
+                $referrer_user = User::where('user_referral_code', '=', $request->invite_code)->first();
+                if($referrer_user !== null){
+                    //echo "2 here \n <br> \n ";
+                    UtilController::addNotificationToUserQueue("Invite Code Used", "Someone just used your invite code. When they make their first order, you get a discount code.", $referrer_user->user_phone, 6011);
+                    UtilController::sendNotificationToUser($referrer_user->user_notification_token_android,"normal","Invite Code Used - MeMaww", "Someone just used your invite code. When they make their first order, you get a discount code.");
+                    UtilController::sendNotificationToUser($referrer_user->user_notification_token_ios,"normal","Invite Code Used - MeMaww", "Someone just used your invite code. When they make their first order, you get a discount code.");
+                }
+            }
         }
 
         $user1 = User::with('userCountry')->where("user_id", $user1->user_id)->latest()->first();
@@ -357,6 +368,9 @@ class UserController extends Controller
             }
             */
 
+            //$recent_discount = Discount::where('discount_restricted_to_user_id', '=', auth()->user()->invite_code)->first();
+            
+
             $original_price = $final_price;
             if(!empty($request->discount_code) && $final_price > 0){
                 $discount = Discount::where('discount_code', '=', $request->discount_code)->first();
@@ -369,6 +383,13 @@ class UserController extends Controller
                     $final_price =  $final_price * ((100-$discount->discount_percentage)/100);
                 }
             }
+            /*
+            else if($recent_discount !== null){
+                echo "\n<b><b> here\n\n";
+                var_dump($recent_discount);
+            }
+            exit;
+            */
 
             $final_price = strval($final_price);
             
@@ -467,12 +488,32 @@ class UserController extends Controller
             ]);
         }
 
+        if($the_order->order_user_id != auth()->user()->user_id){
+            return response([
+                "status" => "error", 
+                "message" => "How did that happen???"
+            ]);
+        }
+
         if($the_order->order_status != 0){
             return response([
                 "status" => "error", 
                 "message" => "Order in advanced state"
             ]);
         }
+
+        $first_order = Order::where('order_user_id', '=', auth()->user()->user_id)->get()->count();
+        if($first_order == 1 && ($request->order_payment_status == "approved" || $request->order_payment_status == "pay_on_pickup")){
+            $invitors_user_id = User::where('user_referral_code', '=', auth()->user()->user_invitors_referral_code)->first();
+            if($invitors_user_id != null){
+                UtilController::giveDiscount(config('app.referral_discount_percentage'), $invitors_user_id->user_id, "MeMaww Auto", false, true, UtilController::getDatePlusOrMinusDays(new DateTime(), "+3 days"));
+                UtilController::addNotificationToUserQueue("You have a discount", "Someone you referred placed an order so we gave you a discount.", $invitors_user_id->user_phone, 6011);
+                UtilController::sendNotificationToUser($invitors_user_id->user_notification_token_android,"normal","Discount Received - MeMaww", "Someone you referred placed an order so we gave you a discount.");
+                UtilController::sendNotificationToUser($invitors_user_id->user_notification_token_ios,"normal","Discount Received - MeMaww", "Someone you referred placed an order so we gave you a discount.");    
+            }
+        }
+
+        
 
         if($request->order_payment_status == "approved" || $request->order_payment_status == "pay_on_pickup"){
             $the_order->order_status = 1;
@@ -743,7 +784,7 @@ class UserController extends Controller
 
 
 
-
+/*
     public function confirmCollectionRequestOrder(Request $request){
 
         if (!Auth::guard('api')->check() || !$request->user()->tokenCan("use-mobile-apps-as-normal-user")) {
@@ -776,7 +817,7 @@ class UserController extends Controller
         // REMEMBER TO GIVE REFERROR'S THEIR DISCOUNT AS A MESSAGE AND NOTIFICATION
         // WHEN THEIR INVITEES PLACE THEIR FIRST ORDER
     }
-
+*/
     public function requestCollectionCallBack(Request $request){
         if (!Auth::guard('api')->check() || !$request->user()->tokenCan("use-mobile-apps-as-normal-user")) {
             return response(["status" => "fail", "message" => "Permission Denied. Please log out and login again"]);
@@ -1085,13 +1126,13 @@ class UserController extends Controller
             return response([
                 "status" => "success", 
                 "min_vc" => config('app.androidminvc'), 
-                "message" => "Please update your app from the Google Play Store."
+                "message" => "Success"
             ]);
         } else if(strtoupper($request->app_type) == "IOS"){
             return response([
             "status" => "error", 
             "min_vc" => config('app.iosminvc'), 
-            "message" => "Please update your app from the Apple App Store."
+            "message" => "Success"
             ]);
         } else {
             return response([

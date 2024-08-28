@@ -24,6 +24,7 @@ class Discount extends Model
         'discount_admin_name',
         'discount_reusable',
         'discount_can_be_used',
+        'discount_expiry_date',
         'created_at',
         'updated_at',
     ];

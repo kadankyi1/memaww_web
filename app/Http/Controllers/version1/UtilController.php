@@ -4,6 +4,7 @@ namespace App\Http\Controllers\version1;
 
 use DateTime;
 use App\Http\Controllers\Controller;
+use App\Models\version1\Discount;
 use App\Models\version1\Notification;
 use Illuminate\Http\Request;
 
@@ -71,8 +72,27 @@ class UtilController extends Controller
     public static function reformatDate($input_date, $needed_format)
     {
         return date($needed_format, strtotime($input_date));
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    |--------------------------------------------------------------------------
+    | THIS FUNCTION GETS NEW DATE TIME AFTER GIVEN DATE TIME
+    |--------------------------------------------------------------------------
+    |--------------------------------------------------------------------------
+    */
+
+
+    public static function getDatePlusOrMinusDays($start_date, $change_days)
+    {
+        //$start_date = new DateTime();
+        $start_date->modify($change_days);
+
+        return $start_date->format("Y-m-d");
+        //date($needed_format, strtotime($input_date));
 
     }
+
     /*
     |--------------------------------------------------------------------------
     |--------------------------------------------------------------------------
@@ -178,5 +198,25 @@ class UtilController extends Controller
         $notification = Notification::create($notification);
 
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    |--------------------------------------------------------------------------
+    | THIS FUNCTION GIVES A DISCOUNT
+    |--------------------------------------------------------------------------
+    |--------------------------------------------------------------------------
+    */
+	public static function giveDiscount($discount_percentage, $discount_restricted_to_user_id, $discount_admin_name, $discount_reusable, $discount_can_be_used, $discount_expiry_date) 
+    {
+        $given_discount["discount_code"] = UtilController::getRandomString(8);
+        $given_discount["discount_percentage"] = $discount_percentage;
+        $given_discount["discount_restricted_to_user_id"] = $discount_restricted_to_user_id;
+        $given_discount["discount_admin_name"] = $discount_admin_name;
+        $given_discount["discount_reusable"] = $discount_reusable;
+        $given_discount["discount_can_be_used"] = $discount_can_be_used;
+        $given_discount["discount_expiry_date"] = $discount_expiry_date;
+        return Discount::create($given_discount);
+	}
+
 
 }
