@@ -503,6 +503,13 @@ class UserController extends Controller
             UtilController::sendNotificationToUser(auth()->user()->user_notification_token_android,"normal","Order Received - MeMaww", "Your order has been received. Expect a biker or call soon.");
             UtilController::sendNotificationToUser(auth()->user()->user_notification_token_ios,"normal","Order Received - MeMaww", "Your order has been received. Expect a biker or call soon.");
         
+            $user_admin = User::where('user_id', '=', 1)->first();
+            if($user_admin != null){
+                UtilController::sendNotificationToUser($user_admin->user_notification_token_android, "normal","New Order From Client - MeMaww", "A Client of MeMaww has placed an order");
+                UtilController::sendNotificationToUser($user_admin->user_notification_token_ios,"normal","New Order From Client - MeMaww", "A Client of MeMaww has placed an order");
+            }
+    
+
             $email_data = array(
                 'pickup_time' => "Time: " . $the_order->order_collection_date,
                 'pickup_location_raw' => $the_order->order_collection_location_raw,
