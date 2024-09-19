@@ -99,17 +99,26 @@ class UserController extends Controller
                 "message" => "Service not available in your country."
             ]);
         }
+
         
         //CHECKING IF USER EXISTS
         $user1 = User::where('user_phone', '=', $user_phone_correct)->first();
 
         if($user1 === null){
+            for ($i=5; $i < 10; $i++) { 
+                $this_referral_code = substr(sha1(md5(time())), -$i);
+                $user2 = User::where('user_referral_code', '=', $this_referral_code)->first();
+                if($user2 === null){
+                    break;
+                }    
+            }
+    
             $userData["user_sys_id"] = date("Y-m-d-H-i-s") . UtilController::getRandomString(91);
             $userData["user_first_name"] = $request->user_first_name;
             $userData["user_last_name"] = $request->user_last_name;
             $userData["user_phone"] = $user_phone_correct;
             $userData["user_country_id"] = $user_country->country_id;
-            $userData["user_referral_code"] = substr(uniqid(),-10);
+            $userData["user_referral_code"] = $this_referral_code;
             $userData["user_invitors_referral_code"] = $request->invite_code;
             $userData["user_notification_token_android"] = "";
             $userData["user_notification_token_web"] = "";
@@ -500,10 +509,10 @@ class UserController extends Controller
                 'pickup_location_gps' => $the_order->order_collection_location_gps,
                 'user_name' => auth()->user()->user_first_name . " " . auth()->user()->user_last_name,
                 'user_phone' => auth()->user()->user_phone,
-                'order_status' => $the_order->order_status,
+                'order_status' => $the_order->getOrderStatusMessageAttribute(),
                 'order_time' => $the_order->created_at,
                 'order_payment_amt' => $the_order->order_user_countrys_currency . $the_order->order_final_price_in_user_countrys_currency,
-                'order_payment_status' => $the_order->order_payment_status,
+                'order_payment_status' => $request->order_payment_status == 1 ? "Paid" : "Pay On Pickup",
                 'order_lightweightitems_just_wash_quantity' => $the_order->order_lightweightitems_just_wash_quantity,
                 'order_lightweightitems_wash_and_iron_quantity' => $the_order->order_lightweightitems_wash_and_iron_quantity,
                 'order_lightweightitems_just_iron_quantity' => $the_order->order_lightweightitems_just_iron_quantity,
