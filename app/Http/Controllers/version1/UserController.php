@@ -18,6 +18,7 @@ use App\Models\version1\Message;
 use App\Models\version1\Notification;
 use App\Models\version1\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -142,6 +143,7 @@ class UserController extends Controller
         return response([
             "status" => "success", 
             "message" => "Sign-in successful",
+            "user_phone_local" => $request->user_phone,
             "access_token" => $accessToken,
             "user" => $user1,
         ]);
@@ -321,76 +323,35 @@ class UserController extends Controller
                 $final_price = $final_price + ($request->bigitems_washandiron_quantity * 30);
             }
 
-            /*
-            // LIGHT WEIGHT ITEMS --- WASH AND FOLD
-            if($request->smallitems_justwash_quantity < 10 && $request->smallitems_justwash_quantity > 0){
-                $final_price = $final_price + 70;
-            } else if($request->smallitems_justwash_quantity >= 10 && $request->smallitems_justwash_quantity < 15){
-                $final_price = $final_price + ($request->smallitems_justwash_quantity * 7);
-            } else {
-                $final_price = $final_price + ($request->smallitems_justwash_quantity * 5);
-            }
-
-            // LIGHT WEIGHT ITEMS --- WASH AND IRON
-            if($request->smallitems_washandiron_quantity < 10 && $request->smallitems_washandiron_quantity > 0 && $final_price < 70){
-                $final_price = $final_price + 100;
-            } else if($request->smallitems_washandiron_quantity >= 10 && $request->smallitems_washandiron_quantity < 15 && $final_price < 70){
-                $final_price = $final_price + ($request->smallitems_washandiron_quantity * 10);
-            } else {
-                $final_price = $final_price + ($request->smallitems_washandiron_quantity * 8);
-            }
-
-            // LIGHT WEIGHT ITEMS --- JUST IRON
-            if($request->smallitems_justiron_quantity < 10 && $request->smallitems_justiron_quantity > 0 && $final_price < 70){
-                $final_price = $final_price + 70;
-            } else if($request->smallitems_justiron_quantity >= 10 && $request->smallitems_justiron_quantity < 15 && $final_price < 70){
-                $final_price = $final_price + ($request->smallitems_justiron_quantity * 6);
-            } else {
-                $final_price = $final_price + ($request->smallitems_justiron_quantity * 5);
-            }
-            
-            // BULKY ITEMS --- WASH AND FOLD
-            if($request->bigitems_justwash_quantity == 1 && $final_price < 70){
-                $final_price = $final_price + 50;
-            } else if($request->bigitems_justwash_quantity >= 2 && $request->bigitems_justwash_quantity < 5 && $final_price < 70){
-                $final_price = $final_price + ($request->bigitems_justwash_quantity * 35);
-            } else {
-                $final_price = $final_price + ($request->bigitems_justwash_quantity * 25);
-            }
-             
-            // BULKY ITEMS --- WASH AND IRON
-            if($request->bigitems_washandiron_quantity == 1 && $final_price < 70){
-                $final_price = $final_price + 80;
-            } else if($request->bigitems_washandiron_quantity >= 2 && $request->bigitems_washandiron_quantity < 5 && $final_price < 70){
-                $final_price = $final_price + ($request->bigitems_washandiron_quantity * 40);
-            } else {
-                $final_price = $final_price + ($request->bigitems_washandiron_quantity * 30);
-            }
-            */
-
-            //$recent_discount = Discount::where('discount_restricted_to_user_id', '=', auth()->user()->invite_code)->first();
-            
+            $query1 = "SELECT * FROM discounts WHERE discount_restricted_to_user_id = ? AND discount_can_be_used = ? ORDER BY discount_id ASC LIMIT 1";
+            $values1 = [auth()->user()->user_id, true];
+            $discount1 = DB::select($query1, $values1);
 
             $original_price = $final_price;
             if(!empty($request->discount_code) && $final_price > 0){
-                $discount = Discount::where('discount_code', '=', $request->discount_code)->first();
-                //var_dump($discount); exit;
-                if(!empty($discount->discount_percentage) && $discount->discount_percentage > 0 && (empty($discount->discount_restricted_to_user_id) || ($discount->discount_restricted_to_user_id == auth()->user()->user_id))){
-                    $discount_id = $discount->discount_id;
-                    $discount_percentage =  $discount->discount_percentage;
-                    $discount_amount = $final_price * (($discount->discount_percentage)/100);
+                $query2 = "SELECT * FROM discounts WHERE discount_code = ? AND discount_can_be_used = ? ORDER BY discount_id ASC LIMIT 1";
+                $values2 = [$request->discount_code, true];
+                $discount2 = DB::select($query2, $values2);
+    
+                //$discount = Discount::where('discount_code', '=', $request->discount_code)->where('discount_restricted_to_user_id ','=', NULL)->where('message_receiver_id', auth()->user()->user_id)->first();
+                if(!empty($discount2[0]->discount_percentage) && $discount2[0]->discount_percentage > 0 && (empty($discount2[0]->discount_restricted_to_user_id) || ($discount2[0]->discount_restricted_to_user_id == auth()->user()->user_id))){
+                    $discount_id = $discount2[0]->discount_id;
+                    $discount_percentage =  $discount2[0]->discount_percentage;
+                    $discount_amount = $final_price * (($discount2[0]->discount_percentage)/100);
                     $discount_amount_usd = $discount_amount/config('app.one_dollar_to_one_ghana_cedi');
-                    $final_price =  $final_price * ((100-$discount->discount_percentage)/100);
+                    $final_price =  $final_price * ((100-$discount2[0]->discount_percentage)/100);
+                    //var_dump($discount2); exit;
                 }
             }
-            /*
-            else if($recent_discount !== null){
-                echo "\n<b><b> here\n\n";
-                var_dump($recent_discount);
-            }
-            exit;
-            */
-
+            
+            if(empty($discount_id) && !empty($discount1[0]->discount_percentage) && $discount1[0]->discount_percentage > 0){
+                $discount_id = $discount1[0]->discount_id;
+                $discount_percentage =  $discount1[0]->discount_percentage;
+                $discount_amount = $final_price * (($discount1[0]->discount_percentage)/100);
+                $discount_amount_usd = $discount_amount/config('app.one_dollar_to_one_ghana_cedi');
+                $final_price =  $final_price * ((100-$discount1[0]->discount_percentage)/100);
+        }
+            
             $final_price = strval($final_price);
             
         } else {
@@ -440,7 +401,7 @@ class UserController extends Controller
             "pay_online" => $pay_online, 
             "pay_on_pickup" => $pay_on_pickup, 
             "original_price" => $userCountry->country_currency_symbol . strval($original_price), 
-            "discount_percentage" => $userCountry->country_currency_symbol . strval($discount_percentage), 
+            "discount_percentage" => strval($discount_percentage) . "%", 
             "discount_amount" => $userCountry->country_currency_symbol . strval($discount_amount), 
             "price_final" => $userCountry->country_currency_symbol . strval($final_price), 
             "price_final_no_currency" => strval($final_price), 
@@ -522,6 +483,12 @@ class UserController extends Controller
             $the_order->order_payment_details = $request->order_payment_details;
             $the_order->save();
 
+            //UPDATING DISCOUNT CODE USED
+            if(!empty($the_order->order_discount_id)){
+                $discount_used = Discount::where('discount_id', '=', $the_order->order_discount_id)->first();
+                $discount_used->discount_can_be_used = false;
+                $discount_used->save();
+            }
 
             UtilController::addNotificationToUserQueue("Order Received", "Your order has been received. Expect a biker or call soon.", auth()->user()->user_phone, 6011);
             UtilController::sendNotificationToUser(auth()->user()->user_notification_token_android,"normal","Order Received - MeMaww", "Your order has been received. Expect a biker or call soon.");
