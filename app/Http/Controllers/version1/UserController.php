@@ -17,6 +17,7 @@ use App\Models\version1\Discount;
 use App\Models\version1\Message;
 use App\Models\version1\Notification;
 use App\Models\version1\Order;
+use App\Models\version1\Subscription;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -517,6 +518,7 @@ class UserController extends Controller
                 'user_name' => auth()->user()->user_first_name . " " . auth()->user()->user_last_name,
                 'user_phone' => auth()->user()->user_phone,
                 'order_status' => $the_order->getOrderStatusMessageAttribute(),
+                'order_id' => $the_order->order_id,
                 'order_time' => $the_order->created_at,
                 'order_payment_amt' => $the_order->order_user_countrys_currency . $the_order->order_final_price_in_user_countrys_currency,
                 'order_payment_status' => $request->order_payment_status == 1 ? "Paid" : "Pay On Pickup",
@@ -1128,4 +1130,30 @@ class UserController extends Controller
     }
 
 
+    function getSubscriptionOffers(Request $request){
+        if (!Auth::guard('api')->check() || !$request->user()->tokenCan("use-mobile-apps-as-normal-user")) {
+            return response(["status" => "fail", "message" => "Permission Denied. Please log out and login again"]);
+        }
+
+        if (auth()->user()->user_flagged) {
+            $request->user()->token()->revoke();
+            return response(["status" => "fail", "message" => "Account access restricted"]);
+        }
+    
+
+        // MAKING SURE THE INPUT HAS THE EXPECTED VALUES
+        $validatedData = $request->validate([
+            "app_type" => "bail|required|max:8",
+            "app_version_code" => "bail|required|integer"
+        ]);
+    
+        $subscription_offers = Subscription::where("subscription_country_id", auth()->user()->user_country_id)->take(3)->get();
+
+        return response([
+            "status" => "success", 
+            "message" => "Operation successful", 
+            "data" => $subscription_offers
+        ]);
+
+    }
 }

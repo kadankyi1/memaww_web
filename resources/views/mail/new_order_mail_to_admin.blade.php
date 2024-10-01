@@ -1,6 +1,6 @@
 @component('mail::message')
 
-# New Order
+# New Order - {{ $email_data['order_id'] }} 
 There is a new order that should be worked on.
 <br>Status: {{ $email_data['order_status'] }} 
 <br>Order DateTime: {{ $email_data['order_time'] }} 
