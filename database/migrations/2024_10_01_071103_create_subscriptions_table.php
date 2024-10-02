@@ -15,8 +15,8 @@ return new class extends Migration
             $table->bigIncrements('subscription_id');
             $table->integer('subscription_days')->default(0);
             $table->integer('subscription_months')->default(0);
-            $table->decimal('subscription_amt_per_month',9,2);
-            $table->decimal('subscription_amt_total',9,2);
+            $table->integer('subscription_amt_per_month');
+            $table->integer('subscription_amt_total');
             $table->text('subscription_package_description_1');
             $table->text('subscription_package_description_2');
             $table->text('subscription_package_description_3');

@@ -1130,7 +1130,7 @@ class UserController extends Controller
     }
 
 
-    function getSubscriptionOffers(Request $request){
+    function getSubscriptionPricing(Request $request){
         if (!Auth::guard('api')->check() || !$request->user()->tokenCan("use-mobile-apps-as-normal-user")) {
             return response(["status" => "fail", "message" => "Permission Denied. Please log out and login again"]);
         }
@@ -1147,12 +1147,39 @@ class UserController extends Controller
             "app_version_code" => "bail|required|integer"
         ]);
     
-        $subscription_offers = Subscription::where("subscription_country_id", auth()->user()->user_country_id)->take(3)->get();
+        $subscription_offers = Subscription::where("subscription_country_id", auth()->user()->user_country_id)->take(4)->get();
 
+        
+        $this_country_currency_symbol = Country::where('country_id', '=', auth()->user()->user_country_id)->first()->country_currency_symbol;
+
+        if(empty($this_country_currency_symbol)){
+            return response([
+                "status" => "error", 
+                "message" => "User currency not found"
+            ]);
+        }
+        
         return response([
             "status" => "success", 
             "message" => "Operation successful", 
-            "data" => $subscription_offers
+
+            "currency_symbol" => $this_country_currency_symbol, 
+            
+            "sub_1_to_2_ppl_1month" => "305", 
+            "sub_3_to_5_ppl_1month" => "530", 
+            "sub_6_to_10_ppl_1month" => "710", 
+            
+            "sub_1_to_2_ppl_3months" => "287", 
+            "sub_3_to_5_ppl_3months" => "502", 
+            "sub_6_to_10_ppl_3months" => "674",
+            
+            "sub_1_to_2_ppl_6months" => "278", 
+            "sub_3_to_5_ppl_6months" => "476", 
+            "sub_6_to_10_ppl_6months" => "638", 
+            
+            "sub_1_to_2_ppl_12months" => "260", 
+            "sub_3_to_5_ppl_12months" => "458", 
+            "sub_6_to_10_ppl_12months" => "602"
         ]);
 
     }
