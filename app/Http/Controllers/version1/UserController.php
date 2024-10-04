@@ -1165,21 +1165,27 @@ class UserController extends Controller
 
             "currency_symbol" => $this_country_currency_symbol, 
             
-            "sub_1_to_2_ppl_1month" => "305", 
-            "sub_3_to_5_ppl_1month" => "530", 
-            "sub_6_to_10_ppl_1month" => "710", 
+            "sub_1_to_2_ppl_1month" => strval(305*1), 
+            "sub_3_to_5_ppl_1month" => strval(530*1) , 
+            "sub_6_to_10_ppl_1month" => strval(710*1), 
             
-            "sub_1_to_2_ppl_3months" => "287", 
-            "sub_3_to_5_ppl_3months" => "502", 
-            "sub_6_to_10_ppl_3months" => "674",
+            "sub_1_to_2_ppl_3months" => strval(287*3), 
+            "sub_3_to_5_ppl_3months" => strval(502*3), 
+            "sub_6_to_10_ppl_3months" => strval(674*3),
             
-            "sub_1_to_2_ppl_6months" => "278", 
-            "sub_3_to_5_ppl_6months" => "476", 
-            "sub_6_to_10_ppl_6months" => "638", 
+            "sub_1_to_2_ppl_6months" => strval(278*6), 
+            "sub_3_to_5_ppl_6months" => strval(476*6), 
+            "sub_6_to_10_ppl_6months" => strval(638*6), 
             
-            "sub_1_to_2_ppl_12months" => "260", 
-            "sub_3_to_5_ppl_12months" => "458", 
-            "sub_6_to_10_ppl_12months" => "602"
+            "sub_1_to_2_ppl_12months" => strval(260*12), 
+            "sub_3_to_5_ppl_12months" => strval(458*12), 
+            "sub_6_to_10_ppl_12months" => strval(602*12),
+
+
+            "packageinfo1" => "1 pickup and delivery per week", 
+            "packageinfo2" => "Unlimited items", 
+            "packageinfo3" => "Wash & Fold/Iron",
+            "packageinfo4" => "Operation successful", 
         ]);
 
     }
