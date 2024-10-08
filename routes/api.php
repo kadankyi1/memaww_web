@@ -45,3 +45,6 @@ Route::middleware('auth:api')->post('/v1/user/update-user-info', [App\Http\Contr
 
 // GET MY MESSAGES
 Route::middleware('auth:api')->post('/v1/user/get-subscription-pricing', [App\Http\Controllers\version1\UserController::class, 'getSubscriptionPricing']);
+
+// GET MY MESSAGES
+Route::middleware('auth:api')->post('/v1/user/set-user-subscription', [App\Http\Controllers\version1\UserController::class, 'setUserSubscription']);

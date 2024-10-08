@@ -40,6 +40,7 @@ class User extends Authenticatable
         'user_phone',
         'user_country_id',
         'user_referral_code',
+        'subscription_id',
         'user_invitors_referral_code',
         'user_notification_token_android',
         'user_notification_token_web',

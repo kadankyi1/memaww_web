@@ -1146,24 +1146,35 @@ class UserController extends Controller
             "app_type" => "bail|required|max:8",
             "app_version_code" => "bail|required|integer"
         ]);
-    
-        $subscription_offers = Subscription::where("subscription_country_id", auth()->user()->user_country_id)->take(4)->get();
 
         
-        $this_country_currency_symbol = Country::where('country_id', '=', auth()->user()->user_country_id)->first()->country_currency_symbol;
+        $subscription_country = Country::where('country_id', '=', auth()->user()->user_country_id)->first();
 
-        if(empty($this_country_currency_symbol)){
+        if(empty($subscription_country->country_currency_symbol)){
             return response([
                 "status" => "error", 
                 "message" => "User currency not found"
             ]);
         }
+
+        $subscription_id = "subs_" . auth()->user()->user_id . "_" . date('YmdHis');
         
         return response([
             "status" => "success", 
             "message" => "Operation successful", 
+            
+            "subscription_id" => $subscription_id, 
+            "user_email" => auth()->user()->user_phone . "@memaww.com", 
+            "txn_narration" => "Laundry subscription by " . auth()->user()->user_last_name . " " . auth()->user()->user_first_name, 
+            "txn_reference" => $subscription_id, 
+            "merchant_id" => config('app.payment_gateway_merchant_id'), 
+            "merchant_api_user" => config('app.payment_gateway_merchant_api_user'), 
+            "merchant_api_key" => config('app.payment_gateway_merchant_api_key'), 
+            "merchant_test_api_key" => config('app.payment_gateway_merchant_test_api_key'), 
+            "return_url" => config('app.url') . "/subscription/" . $subscription_id, 
 
-            "currency_symbol" => $this_country_currency_symbol, 
+            "currency_symbol" => $subscription_country->country_currency_symbol, 
+            "subscription_country_id" => strval(auth()->user()->user_country_id), 
             
             "sub_1_to_2_ppl_1month" => strval(305*1), 
             "sub_3_to_5_ppl_1month" => strval(530*1) , 
@@ -1185,8 +1196,89 @@ class UserController extends Controller
             "packageinfo1" => "1 pickup and delivery per week", 
             "packageinfo2" => "Unlimited items", 
             "packageinfo3" => "Wash & Fold/Iron",
-            "packageinfo4" => "Operation successful", 
+            "packageinfo4" => "Delivery in 48hrs", 
         ]);
 
     }
+
+    
+    public function setUserSubscription(Request $request){
+        if (!Auth::guard('api')->check() || !$request->user()->tokenCan("use-mobile-apps-as-normal-user")) {
+            return response(["status" => "fail", "message" => "Permission Denied. Please log out and login again"]);
+        }
+
+        if (auth()->user()->user_flagged) {
+            $request->user()->token()->revoke();
+            return response(["status" => "fail", "message" => "Account access restricted"]);
+        }
+
+        $validatedData = $request->validate([
+            "subscription_payment_transaction_id" => "bail|required|max:1000",
+            "subscription_amount_paid" => "bail|required|integer",
+            "subscription_max_number_of_people_in_home" => "bail|required|integer|digits_between:-1,11",
+            "subscription_number_of_months" => "bail|required|integer|digits_between:0,13",
+            "subscription_pickup_time" => "bail|required|max:5",
+            "subscription_pickup_location" => "bail|required|max:100",
+            "subscription_package_description" => "bail|required|max:100",
+            "subscription_country_id" => "bail|required|integer",
+            "app_type" => "bail|required|max:8",
+            "app_version_code" => "bail|required|integer"
+        ]);
+
+
+        $user1 = User::where('user_id', '=', auth()->user()->user_id)->first();
+
+        if($user1 === null){
+            return response([
+                "status" => "error", 
+                "message" => "User not found"
+            ]);
+        }
+
+        if(
+            ($request->subscription_max_number_of_people_in_home == "2" && $request->subscription_number_of_months == "1" && $request->subscription_amount_paid != strval(305*1))
+            || ($request->subscription_max_number_of_people_in_home == "5" && $request->subscription_number_of_months == "1" && $request->subscription_amount_paid != strval(530*1))
+            || ($request->subscription_max_number_of_people_in_home == "10" && $request->subscription_number_of_months == "1" && $request->subscription_amount_paid != strval(710*1))
+            || ($request->subscription_max_number_of_people_in_home == "2" && $request->subscription_number_of_months == "3" && $request->subscription_amount_paid != strval(287*3))
+            || ($request->subscription_max_number_of_people_in_home == "5" && $request->subscription_number_of_months == "3" && $request->subscription_amount_paid != strval(502*3))
+            || ($request->subscription_max_number_of_people_in_home == "10" && $request->subscription_number_of_months == "3" && $request->subscription_amount_paid != strval(674*3))
+            || ($request->subscription_max_number_of_people_in_home == "2" && $request->subscription_number_of_months == "6" && $request->subscription_amount_paid != strval(278*6))
+            || ($request->subscription_max_number_of_people_in_home == "5" && $request->subscription_number_of_months == "6" && $request->subscription_amount_paid != strval(476*6))
+            || ($request->subscription_max_number_of_people_in_home == "10" && $request->subscription_number_of_months == "6" && $request->subscription_amount_paid != strval(638*6))
+            || ($request->subscription_max_number_of_people_in_home == "2" && $request->subscription_number_of_months == "12" && $request->subscription_amount_paid != strval(260*12))
+            || ($request->subscription_max_number_of_people_in_home == "5" && $request->subscription_number_of_months == "12" && $request->subscription_amount_paid != strval(458*12))
+            || ($request->subscription_max_number_of_people_in_home == "10" && $request->subscription_number_of_months == "12" && $request->subscription_amount_paid != strval(602*12))
+            ){
+                return response([
+                    "status" => "error", 
+                    "message" => "Subscription offer expired. Your payment will be refunded within 24 hours."
+                ]);
+        }
+
+        $subscriptionData["subscription_items_washed"] = 0;
+        $subscriptionData["subscription_pickups_done"] = 0;
+        $subscriptionData["subscription_payment_transaction_id"] = $validatedData["subscription_payment_transaction_id"];
+        $subscriptionData["subscription_payment_response"] = "subscription_payment_response";
+        $subscriptionData["subscription_amount_paid"] = $validatedData["subscription_amount_paid"];
+        $subscriptionData["subscription_max_number_of_people_in_home"] = $validatedData["subscription_max_number_of_people_in_home"];
+        $subscriptionData["subscription_number_of_months"] = $validatedData["subscription_number_of_months"];
+        $subscriptionData["subscription_pickup_time"] = $validatedData["subscription_pickup_time"];
+        $subscriptionData["subscription_pickup_location"] = $validatedData["subscription_pickup_location"];
+        $subscriptionData["subscription_package_description"] = $validatedData["subscription_package_description"]; 
+        $subscriptionData["subscription_country_id"] = $validatedData["subscription_country_id"];
+        $subscriptionData["subscription_user_id"] = auth()->user()->user_id;
+        $this_subscription = Subscription::create($subscriptionData);
+
+        $user1->subscription_id = $this_subscription->subscription_id;
+        $user1->save();
+
+        return response([
+            "status" => "success", 
+            "message" => "Operation successful", 
+            "subscription" => $this_subscription
+        ]);
+    
+    }
+
+
 }

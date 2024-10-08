@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('user_phone', 255)->unique();
             $table->string('user_referral_code', 255)->unique();
             $table->string('user_invitors_referral_code', 255)->nullable();
-            //$table->bigInteger('user_country_id')->default(0);
+            $table->bigInteger('subscription_id')->default(0);
             $table->string('user_notification_token_android', 255)->default("");
             $table->string('user_notification_token_web', 255)->default("");
             $table->string('user_notification_token_ios', 255)->default("");
