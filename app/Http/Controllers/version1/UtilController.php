@@ -83,12 +83,12 @@ class UtilController extends Controller
     */
 
 
-    public static function getDatePlusOrMinusDays($start_date, $change_days)
+    public static function getDatePlusOrMinusDays($start_date, $change_days, $needed_format)
     {
         //$start_date = new DateTime();
         $start_date->modify($change_days);
 
-        return $start_date->format("Y-m-d");
+        return $start_date->format($needed_format); //"Y-m-d"
         //date($needed_format, strtotime($input_date));
 
     }

@@ -2,6 +2,7 @@
 
 namespace App\Models\version1;
 
+use App\Http\Controllers\version1\UtilController;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\version1\Country;
@@ -9,12 +10,31 @@ use App\Models\version1\Country;
 class Subscription extends Model
 {
     use HasFactory;
-    protected $appends = ['subscription_currency'];
+    protected $appends = ['subscription_currency', "pickups_count", "pickup_final_time", "subscription_info"];
 
         //define accessor
         public function getSubscriptionCurrencyAttribute()
         {
             return Country::where('country_id', '=', $this->subscription_country_id)->first()->country_currency_symbol;
+        }
+
+        //define accessor
+        public function getPickupsCountAttribute()
+        {
+            return strval($this->subscription_pickups_done)  . " / 4" ;
+        }
+
+
+        //define accessor
+        public function getPickupFinalTimeAttribute()
+        {
+            return strval($this->subscription_pickup_time)  . " - " . strval($this->subscription_pickup_day);
+        }
+
+        //define accessor
+        public function getSubscriptionInfoAttribute()
+        {
+            return "Your subscription ends on " . UtilController::getDatePlusOrMinusDays($this->created_at, "+3 days", "F j, Y");
         }
 
 
@@ -34,6 +54,7 @@ class Subscription extends Model
         'subscription_max_number_of_people_in_home',
         'subscription_number_of_months',
         'subscription_pickup_time',
+        'subscription_pickup_day',
         'subscription_pickup_location',
         'subscription_package_description',
         'subscription_country_id',

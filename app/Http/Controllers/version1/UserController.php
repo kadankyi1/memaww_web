@@ -477,7 +477,7 @@ class UserController extends Controller
         if($first_order == 1 && ($request->order_payment_status == "approved" || $request->order_payment_status == "pay_on_pickup")){
             $invitors_user_id = User::where('user_referral_code', '=', auth()->user()->user_invitors_referral_code)->first();
             if($invitors_user_id != null){
-                UtilController::giveDiscount(config('app.referral_discount_percentage'), $invitors_user_id->user_id, "MeMaww Auto", false, true, UtilController::getDatePlusOrMinusDays(new DateTime(), "+3 days"));
+                UtilController::giveDiscount(config('app.referral_discount_percentage'), $invitors_user_id->user_id, "MeMaww Auto", false, true, UtilController::getDatePlusOrMinusDays(new DateTime(), "+3 days", "Y-m-d"));
                 UtilController::addNotificationToUserQueue("You have a discount", "Someone you referred placed an order so we gave you a discount.", $invitors_user_id->user_phone, 6011);
                 UtilController::sendNotificationToUser($invitors_user_id->user_notification_token_android,"normal","Discount Received - MeMaww", "Someone you referred placed an order so we gave you a discount.");
                 UtilController::sendNotificationToUser($invitors_user_id->user_notification_token_ios,"normal","Discount Received - MeMaww", "Someone you referred placed an order so we gave you a discount.");    
@@ -1257,6 +1257,7 @@ class UserController extends Controller
 
         $subscriptionData["subscription_items_washed"] = 0;
         $subscriptionData["subscription_pickups_done"] = 0;
+        $subscriptionData["subscription_pickup_day"] = "Saturday";
         $subscriptionData["subscription_payment_transaction_id"] = $validatedData["subscription_payment_transaction_id"];
         $subscriptionData["subscription_payment_response"] = "subscription_payment_response";
         $subscriptionData["subscription_amount_paid"] = $validatedData["subscription_amount_paid"];
