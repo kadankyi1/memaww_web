@@ -1069,12 +1069,12 @@ class UserController extends Controller
 
     public function updateUserInfo(Request $request){
         if (!Auth::guard('api')->check() || !$request->user()->tokenCan("use-mobile-apps-as-normal-user")) {
-            return response(["status" => "fail", "message" => "Permission Denied. Please log out and login again"]);
+            return response(["status" => "fail", "message" => "Permission Denied. Please log out and login again", "subscription_set" => false]);
         }
 
         if (auth()->user()->user_flagged) {
             $request->user()->token()->revoke();
-            return response(["status" => "fail", "message" => "Account access restricted"]);
+            return response(["status" => "fail", "message" => "Account access restricted", "subscription_set" => false]);
         }
     
         $validatedData = $request->validate([
@@ -1090,8 +1090,38 @@ class UserController extends Controller
         if($user1 === null){
             return response([
                 "status" => "error", 
-                "message" => "User not found"
+                "message" => "User not found", 
+                "subscription_set" => false
             ]);
+        }
+
+        $user_subscription = Subscription::where('subscription_id', '=', $user1->subscription_id)->first();
+        $subscription_set = false;
+
+
+        
+        /*
+        echo ((UtilController::getTimePassed($user_subscription->created_at, date('Y-m-d H:i:s'))/(60*24))/30);
+        
+        echo "\n\n<br><br> SUB DATE: " . $user_subscription->created_at;
+        
+        echo "\n\n<br><br> NOW: " . date('Y-m-d H:i:s');
+        
+        echo "\n\n<br><br> SUB DATE: " . $user_subscription->subscription_payment_transaction_id;
+
+        echo "\n\n<br><br> " . $user_subscription->subscription_number_of_months; exit;
+        */
+
+        
+
+        if(
+            !empty($user_subscription->subscription_payment_transaction_id) 
+            && ((UtilController::getTimePassed($user_subscription->created_at, date('Y-m-d H:i:s'))/(60*24))/30) < $user_subscription->subscription_number_of_months
+            && $user_subscription->subscription_pickups_done < 4){
+            $subscription_set = true;
+        } else {
+            $subscription_set = false;
+            $user_subscription = null;
         }
 
         if($request->fcm_type == "ANDROID"){
@@ -1103,26 +1133,37 @@ class UserController extends Controller
         } else {
             return response([
                 "status" => "error", 
-                "message" => "FCM type unknown"
+                "message" => "FCM type unknown",
+                "subscription_set" => $subscription_set,
+                "subscription" => $user_subscription
             ]);
         }
 
         if(strtoupper($request->app_type) == "ANDROID"){
+
             return response([
                 "status" => "success", 
                 "min_vc" => config('app.androidminvc'), 
-                "message" => "Success"
+                "message" => "Success",
+                "subscription_set" => $subscription_set,
+                "subscription" => $user_subscription
             ]);
+
         } else if(strtoupper($request->app_type) == "IOS"){
+
             return response([
             "status" => "error", 
             "min_vc" => config('app.iosminvc'), 
-            "message" => "Success"
+            "message" => "Success",
+            "subscription_set" => $subscription_set,
+            "subscription" => $user_subscription
             ]);
+
         } else {
             return response([
                 "status" => "error", 
-                "message" => "Device unknown"
+                "message" => "Device unknown",
+                "subscription_set" => $subscription_set
             ]);
         }
 
