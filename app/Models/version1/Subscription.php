@@ -10,7 +10,7 @@ use App\Models\version1\Country;
 class Subscription extends Model
 {
     use HasFactory;
-    protected $appends = ['subscription_currency', "pickups_count", "pickup_final_time", "subscription_info"];
+    protected $appends = ['subscription_currency', "pickups_count", "pickup_final_time", "subscription_info", "items_washed_info"];
 
         //define accessor
         public function getSubscriptionCurrencyAttribute()
@@ -37,6 +37,11 @@ class Subscription extends Model
             return "Your subscription ends on " . UtilController::getDatePlusOrMinusDays($this->created_at, "+3 days", "F j, Y");
         }
 
+        //define accessor
+        public function getItemsWashedInfoAttribute()
+        {
+            return strval($this->subscription_items_washed)  . " / Unlimited" ;
+        }
 
 
     /**
