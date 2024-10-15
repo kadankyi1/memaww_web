@@ -177,7 +177,7 @@ class UserController extends Controller
             $request->user()->token()->revoke();
             return response(["status" => "fail", "message" => "Account access restricted"]);
         }
-    
+
         $validatedData = $request->validate([
             "collect_loc_raw" => "bail|max:100",
             "collect_loc_gps" => "bail|max:22",
@@ -189,6 +189,9 @@ class UserController extends Controller
             "smallitems_justwash_quantity" => "bail|integer|digits_between:-1,1000",
             "smallitems_washandiron_quantity" => "bail|integer|digits_between:-1,1000",
             "smallitems_justiron_quantity" => "bail|integer|digits_between:-1,1000",
+            "mediumitems_justwash_quantity" => "bail|integer|digits_between:-1,1000",
+            "mediumitems_washandiron_quantity" => "bail|integer|digits_between:-1,1000",
+            "mediumitems_justiron_quantity" => "bail|integer|digits_between:-1,1000",
             "bigitems_justwash_quantity" => "bail|integer|digits_between:-1,1000",
             "bigitems_washandiron_quantity" => "bail|integer|digits_between:-1,1000",
             "special_instructions" => "bail|max:2000",
@@ -233,101 +236,147 @@ class UserController extends Controller
             ]);
         }
 
+        if(
+            (($request->smallitems_justwash_quantity + $request->smallitems_washandiron_quantity + $request->smallitems_justiron_quantity) < 10)
+            && (($request->mediumitems_justwash_quantity + $request->mediumitems_washandiron_quantity + $request->mediumitems_justiron_quantity) < 1)
+            && (($request->bigitems_justwash_quantity + $request->bigitems_washandiron_quantity) < 1)
+        ){
+            return response([
+                "status" => "error", 
+                "message" => "Order for only lightweight items needs at least 10 items."
+            ]);
+        }
+
+        if(
+            (
+            ($request->bigitems_washandiron_quantity * 30) 
+            + ($request->bigitems_justwash_quantity * 20)
+            + ($request->mediumitems_washandiron_quantity * 8) 
+            + ($request->mediumitems_justiron_quantity * 5) 
+            + ($request->mediumitems_justwash_quantity * 5)
+            + ($request->smallitems_justwash_quantity * 1)
+            + ($request->smallitems_washandiron_quantity * 1.5)
+            + ($request->smallitems_justiron_quantity * 1)
+            ) < 70
+        ){
+            $final_price_less_than_minimum = true;
+        } else {
+            $final_price_less_than_minimum = false;
+        }
+
         if(auth()->user()->user_country_id == 81) { // GHANA
+            
 
             // LIGHT WEIGHT ITEMS --- WASH AND FOLD
-            if($request->smallitems_justwash_quantity == 1 && $final_price < 70){
-                $final_price = $final_price + 25;
-            } else if($request->smallitems_justwash_quantity == 2 && $final_price < 70){
-                $final_price = $final_price + 30;
-            } else if($request->smallitems_justwash_quantity == 3 && $final_price < 70){
-                $final_price = $final_price + 35;
-            } else if($request->smallitems_justwash_quantity == 4 && $final_price < 70){
-                $final_price = $final_price + 40;
-            } else if($request->smallitems_justwash_quantity == 5 && $final_price < 70){
-                $final_price = $final_price + 45;
-            } else if($request->smallitems_justwash_quantity == 6 && $final_price < 70){
-                $final_price = $final_price + 50;
-            } else if($request->smallitems_justwash_quantity == 7 && $final_price < 70){
-                $final_price = $final_price + 55;
-            }  else if($request->smallitems_justwash_quantity == 8 && $final_price < 70){
-                $final_price = $final_price + 60;
-            }  else if($request->smallitems_justwash_quantity == 9 && $final_price < 70){
-                $final_price = $final_price + 65;
-            }  else if($request->smallitems_justwash_quantity == 10 && $final_price < 70){
-                $final_price = $final_price + 70;
-            } else {
-                $final_price = $final_price + ($request->smallitems_justwash_quantity * 5);
+            if($request->smallitems_justwash_quantity > 0){
+                $final_price = $final_price + ($request->smallitems_justwash_quantity * 1);
             }
 
             // LIGHT WEIGHT ITEMS --- WASH AND IRON
-            if($request->smallitems_washandiron_quantity == 1 && $final_price < 70){
-                $final_price = $final_price + 28;
-            } else if($request->smallitems_washandiron_quantity == 2 && $final_price < 70){
-                $final_price = $final_price + 36;
-            } else if($request->smallitems_washandiron_quantity == 3 && $final_price < 70){
-                $final_price = $final_price + 44;
-            } else if($request->smallitems_washandiron_quantity == 4 && $final_price < 70){
-                $final_price = $final_price + 52;
-            } else if($request->smallitems_washandiron_quantity == 5 && $final_price < 70){
-                $final_price = $final_price + 60;
-            } else if($request->smallitems_washandiron_quantity == 6 && $final_price < 70){
-                $final_price = $final_price + 68;
-            } else if($request->smallitems_washandiron_quantity == 7 && $final_price < 70){
-                $final_price = $final_price + 76;
-            }  else if($request->smallitems_washandiron_quantity == 8 && $final_price < 70){
-                $final_price = $final_price + 84;
-            }  else if($request->smallitems_washandiron_quantity == 9 && $final_price < 70){
-                $final_price = $final_price + 92;
-            }  else if($request->smallitems_washandiron_quantity == 10 && $final_price < 70){
-                $final_price = $final_price + 100;
-            } else {
-                $final_price = $final_price + ($request->smallitems_washandiron_quantity * 8);
+            if($request->smallitems_washandiron_quantity > 0){
+                $final_price = $final_price + ($request->smallitems_washandiron_quantity * 1.5);
             }
 
 
             // LIGHT WEIGHT ITEMS --- JUST IRON
-            if($request->smallitems_justiron_quantity == 1 && $final_price < 70){
-                $final_price = $final_price + 25;
-            } else if($request->smallitems_justiron_quantity == 2 && $final_price < 70){
-                $final_price = $final_price + 30;
-            } else if($request->smallitems_justiron_quantity == 3 && $final_price < 70){
-                $final_price = $final_price + 35;
-            } else if($request->smallitems_justiron_quantity == 4 && $final_price < 70){
-                $final_price = $final_price + 40;
-            } else if($request->smallitems_justiron_quantity == 5 && $final_price < 70){
-                $final_price = $final_price + 45;
-            } else if($request->smallitems_justiron_quantity == 6 && $final_price < 70){
-                $final_price = $final_price + 50;
-            } else if($request->smallitems_justiron_quantity == 7 && $final_price < 70){
-                $final_price = $final_price + 55;
-            }  else if($request->smallitems_justiron_quantity == 8 && $final_price < 70){
-                $final_price = $final_price + 60;
-            }  else if($request->smallitems_justiron_quantity == 9 && $final_price < 70){
-                $final_price = $final_price + 65;
-            }  else if($request->smallitems_justiron_quantity == 10 && $final_price < 70){
-                $final_price = $final_price + 70;
-            } else {
-                $final_price = $final_price + ($request->smallitems_justiron_quantity * 5);
+            if($request->smallitems_justiron_quantity > 0){
+                $final_price = $final_price + ($request->smallitems_justiron_quantity * 1);
             }
 
-            // BULKY ITEMS --- WASH AND FOLD
-            if($request->bigitems_justwash_quantity == 1 && $final_price < 70){
+            // MEDIUM WEIGHT ITEMS --- WASH AND FOLD
+            if($request->mediumitems_justwash_quantity == 1 && $final_price_less_than_minimum){
+                $final_price = $final_price + 25;
+            } else if($request->mediumitems_justwash_quantity == 2 && $final_price_less_than_minimum){
+                $final_price = $final_price + 30;
+            } else if($request->mediumitems_justwash_quantity == 3 && $final_price_less_than_minimum){
+                $final_price = $final_price + 35;
+            } else if($request->mediumitems_justwash_quantity == 4 && $final_price_less_than_minimum){
                 $final_price = $final_price + 40;
-            } else if($request->bigitems_justwash_quantity == 2 && $final_price < 70){
+            } else if($request->mediumitems_justwash_quantity == 5 && $final_price_less_than_minimum){
+                $final_price = $final_price + 45;
+            } else if($request->mediumitems_justwash_quantity == 6 && $final_price_less_than_minimum){
                 $final_price = $final_price + 50;
-            } else if($request->bigitems_justwash_quantity == 3 && $final_price < 70){
+            } else if($request->mediumitems_justwash_quantity == 7 && $final_price_less_than_minimum){
+                $final_price = $final_price + 55;
+            }  else if($request->mediumitems_justwash_quantity == 8 && $final_price_less_than_minimum){
+                $final_price = $final_price + 60;
+            }  else if($request->mediumitems_justwash_quantity == 9 && $final_price_less_than_minimum){
+                $final_price = $final_price + 65;
+            }  else if($request->mediumitems_justwash_quantity == 10 && $final_price_less_than_minimum){
+                $final_price = $final_price + 70;
+            } else {
+                $final_price = $final_price + ($request->mediumitems_justwash_quantity * 5);
+            }
+
+            // MEDIUM WEIGHT ITEMS --- WASH AND IRON
+            if($request->mediumitems_washandiron_quantity == 1 && $final_price_less_than_minimum){
+                $final_price = $final_price + 28;
+            } else if($request->mediumitems_washandiron_quantity == 2 && $final_price_less_than_minimum){
+                $final_price = $final_price + 36;
+            } else if($request->mediumitems_washandiron_quantity == 3 && $final_price_less_than_minimum){
+                $final_price = $final_price + 44;
+            } else if($request->mediumitems_washandiron_quantity == 4 && $final_price_less_than_minimum){
+                $final_price = $final_price + 52;
+            } else if($request->mediumitems_washandiron_quantity == 5 && $final_price_less_than_minimum){
+                $final_price = $final_price + 60;
+            } else if($request->mediumitems_washandiron_quantity == 6 && $final_price_less_than_minimum){
+                $final_price = $final_price + 68;
+            } else if($request->mediumitems_washandiron_quantity == 7 && $final_price_less_than_minimum){
+                $final_price = $final_price + 76;
+            }  else if($request->mediumitems_washandiron_quantity == 8 && $final_price_less_than_minimum){
+                $final_price = $final_price + 84;
+            }  else if($request->mediumitems_washandiron_quantity == 9 && $final_price_less_than_minimum){
+                $final_price = $final_price + 92;
+            }  else if($request->mediumitems_washandiron_quantity == 10 && $final_price_less_than_minimum){
+                $final_price = $final_price + 100;
+            } else {
+                $final_price = $final_price + ($request->mediumitems_washandiron_quantity * 8);
+            }
+
+
+            // MEDIUM WEIGHT ITEMS --- JUST IRON
+            if($request->mediumitems_justiron_quantity == 1 && $final_price_less_than_minimum){
+                $final_price = $final_price + 25;
+            } else if($request->mediumitems_justiron_quantity == 2 && $final_price_less_than_minimum){
+                $final_price = $final_price + 30;
+            } else if($request->mediumitems_justiron_quantity == 3 && $final_price_less_than_minimum){
+                $final_price = $final_price + 35;
+            } else if($request->mediumitems_justiron_quantity == 4 && $final_price_less_than_minimum){
+                $final_price = $final_price + 40;
+            } else if($request->mediumitems_justiron_quantity == 5 && $final_price_less_than_minimum){
+                $final_price = $final_price + 45;
+            } else if($request->mediumitems_justiron_quantity == 6 && $final_price_less_than_minimum){
+                $final_price = $final_price + 50;
+            } else if($request->mediumitems_justiron_quantity == 7 && $final_price_less_than_minimum){
+                $final_price = $final_price + 55;
+            }  else if($request->mediumitems_justiron_quantity == 8 && $final_price_less_than_minimum){
+                $final_price = $final_price + 60;
+            }  else if($request->mediumitems_justiron_quantity == 9 && $final_price_less_than_minimum){
+                $final_price = $final_price + 65;
+            }  else if($request->mediumitems_justiron_quantity == 10 && $final_price_less_than_minimum){
+                $final_price = $final_price + 70;
+            } else {
+                $final_price = $final_price + ($request->mediumitems_justiron_quantity * 5);
+            }
+
+
+            // BULKY ITEMS --- WASH AND FOLD
+            if($request->bigitems_justwash_quantity == 1 && $final_price_less_than_minimum){
+                $final_price = $final_price + 40;
+            } else if($request->bigitems_justwash_quantity == 2 && $final_price_less_than_minimum){
+                $final_price = $final_price + 50;
+            } else if($request->bigitems_justwash_quantity == 3 && $final_price_less_than_minimum){
                 $final_price = $final_price + 65;
             } else {
                 $final_price = $final_price + ($request->bigitems_justwash_quantity * 20);
             }
 
             // BULKY ITEMS --- WASH AND IRON
-            if($request->bigitems_washandiron_quantity == 1 && $final_price < 70){
+            if($request->bigitems_washandiron_quantity == 1 && $final_price_less_than_minimum){
                 $final_price = $final_price + 50;
-            } else if($request->bigitems_washandiron_quantity == 2 && $final_price < 70){
+            } else if($request->bigitems_washandiron_quantity == 2 && $final_price_less_than_minimum){
                 $final_price = $final_price + 70;
-            } else if($request->bigitems_washandiron_quantity == 3 && $final_price < 70){
+            } else if($request->bigitems_washandiron_quantity == 3 && $final_price_less_than_minimum){
                 $final_price = $final_price + 95;
             } else {
                 $final_price = $final_price + ($request->bigitems_washandiron_quantity * 30);
