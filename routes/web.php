@@ -27,6 +27,10 @@ Route::get('/order-payment-update', function () {
     return view('update-order-payment');
 });
 
+Route::get('/delete-my-info', function () {
+    return view('delete-my-info');
+});
+
 // ADMINER
 //Route::any('/adminer', '\Aranyasen\LaravelAdminer\AdminerController@index');
 Route::any('adminer', '\Aranyasen\LaravelAdminer\AdminerAutologinController@index');
