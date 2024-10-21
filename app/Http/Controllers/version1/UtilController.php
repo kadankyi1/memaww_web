@@ -218,33 +218,39 @@ class UtilController extends Controller
         return Discount::create($given_discount);
 	}
 
-    public static function verifyPayStackTransaction($transaction_referennce_id){
+    public static function verifyPayStackTransaction($transaction_id){
         $curl = curl_init();
+        $key = config('app.payment_gateway_merchant_id');
         
         curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.paystack.co/transaction/verify/:$transaction_referennce_id",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "GET",
-            CURLOPT_HTTPHEADER => array(
-            "Authorization: Bearer SECRET_KEY",
+          CURLOPT_URL => "https://prod.theteller.net/v1.1/users/transactions/".$transaction_id."/status",
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => "",
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 30,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => "GET",
+          CURLOPT_HTTPHEADER => array(
             "Cache-Control: no-cache",
-            ),
+            "Merchant-Id: $key"
+          ),
         ));
         
         $response = curl_exec($curl);
         $err = curl_error($curl);
-
+        
         curl_close($curl);
         
         if ($err) {
-            echo "cURL Error #:" . $err;
+          //echo "cURL Error #:" . $err;
+          return json_decode('{"code":"FFF","status":"error"}');
         } else {
-            echo $response;
-        }
+            $response_json = json_decode($response);
+            //echo $response_json->status;
+            //echo "$key \n\n " . $response;
+            return $response_json;
+        }    
+    
     }
 
 }

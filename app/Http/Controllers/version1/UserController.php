@@ -213,7 +213,7 @@ class UserController extends Controller
             return response(["status" => "error", "message" => "Fill in contact person's phone number"]);
         }
 
-        if(($request->smallitems_justwash_quantity + $request->smallitems_washandiron_quantity + $request->smallitems_justiron_quantity + $request->bigitems_justwash_quantity + $request->bigitems_washandiron_quantity) <= 0)
+        if(($request->smallitems_justwash_quantity + $request->smallitems_washandiron_quantity + $request->smallitems_justiron_quantity + $request->bigitems_justwash_quantity + $request->mediumitems_justwash_quantity + $request->mediumitems_washandiron_quantity + $request->mediumitems_justiron_quantity + $request->bigitems_washandiron_quantity) <= 0)
         {
             return response(["status" => "error", "message" => "You have not set the number of items we are picking up."]);
         }
@@ -1247,7 +1247,7 @@ class UserController extends Controller
             ]);
         }
 
-        $subscription_id = "subs_" . auth()->user()->user_id . "_" . date('YmdHis');
+        $subscription_id = "subs_" . auth()->user()->user_id . "_";
         
         return response([
             "status" => "success", 
@@ -1261,7 +1261,7 @@ class UserController extends Controller
             "merchant_api_user" => config('app.payment_gateway_merchant_api_user'), 
             "merchant_api_key" => config('app.payment_gateway_merchant_api_key'), 
             "merchant_test_api_key" => config('app.payment_gateway_merchant_test_api_key'), 
-            "return_url" => config('app.url') . "/subscription/" . $subscription_id, 
+            "return_url" => config('app.url') . "/subscription/" , 
 
             "currency_symbol" => $subscription_country->country_currency_symbol, 
             "subscription_country_id" => strval(auth()->user()->user_country_id), 
@@ -1315,6 +1315,13 @@ class UserController extends Controller
             "app_version_code" => "bail|required|integer"
         ]);
 
+        $payment_verify = UtilController::verifyPayStackTransaction($request->subscription_payment_transaction_id);
+        if($payment_verify->status != "approved") {
+            return response([
+                "status" => "error", 
+                "message" => "Payment verification failed"
+            ]);
+        }
 
         $user1 = User::where('user_id', '=', auth()->user()->user_id)->first();
 
@@ -1349,7 +1356,7 @@ class UserController extends Controller
         $subscriptionData["subscription_pickups_done"] = 0;
         $subscriptionData["subscription_pickup_day"] = "Saturday";
         $subscriptionData["subscription_payment_transaction_id"] = $validatedData["subscription_payment_transaction_id"];
-        $subscriptionData["subscription_payment_response"] = "subscription_payment_response";
+        $subscriptionData["subscription_payment_response"] = $payment_verify->reason;
         $subscriptionData["subscription_amount_paid"] = $validatedData["subscription_amount_paid"];
         $subscriptionData["subscription_max_number_of_people_in_home"] = $validatedData["subscription_max_number_of_people_in_home"];
         $subscriptionData["subscription_number_of_months"] = $validatedData["subscription_number_of_months"];
