@@ -553,7 +553,7 @@ class UserController extends Controller
             $the_order->order_status = 1;
             $the_order->order_payment_method = $request->order_payment_method;
             $the_order->order_payment_status = $payment_verify->status == "approved" ? 1 : 0;
-            $the_order->order_payment_details = $payment_verify->reason;
+            $the_order->order_payment_details = $payment_verify->status == "approved" ? $payment_verify->reason : "pay_on_pickup";
             $the_order->save();
 
             //UPDATING DISCOUNT CODE USED
