@@ -30,6 +30,11 @@ class CreateOrdersTable extends Migration
             $table->bigInteger('order_lightweightitems_just_wash_quantity')->nullable();
             $table->bigInteger('order_lightweightitems_wash_and_iron_quantity')->nullable();
             $table->bigInteger('order_lightweightitems_just_iron_quantity')->nullable();
+            
+            $table->bigInteger('order_mediumitems_justwash_quantity')->nullable();
+            $table->bigInteger('order_mediumitems_washandiron_quantity')->nullable();
+            $table->bigInteger('order_mediumitems_justiron_quantity')->nullable();
+
             $table->bigInteger('order_bulkyitems_just_wash_quantity')->nullable();
             $table->bigInteger('order_bulkyitems_wash_and_iron_quantity')->nullable();
             $table->text('special_instructions')->nullable();

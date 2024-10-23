@@ -442,10 +442,18 @@ class UserController extends Controller
         $orderData["order_final_price_in_user_countrys_currency"] = $final_price;
         $orderData["order_final_price_in_dollars_at_the_time"] = $final_price/config('app.one_dollar_to_one_ghana_cedi');
 
+        && (($request-> + $request-> + $request->) < 1)
+
         //$orderData["order_dropoff_biker_name"] = "";
         $orderData["order_lightweightitems_just_wash_quantity"] = $validatedData["smallitems_justwash_quantity"];
         $orderData["order_lightweightitems_wash_and_iron_quantity"] = $validatedData["smallitems_washandiron_quantity"];
         $orderData["order_lightweightitems_just_iron_quantity"] = $validatedData["smallitems_justiron_quantity"];
+
+
+        $orderData["order_mediumitems_justwash_quantity"] = $validatedData["mediumitems_justwash_quantity"];
+        $orderData["order_mediumitems_washandiron_quantity"] = $validatedData["mediumitems_washandiron_quantity"];
+        $orderData["order_mediumitems_justiron_quantity"] = $validatedData["mediumitems_justiron_quantity"];
+
         $orderData["order_bulkyitems_just_wash_quantity"] = $validatedData["bigitems_justwash_quantity"];
         $orderData["order_bulkyitems_wash_and_iron_quantity"] = $validatedData["bigitems_washandiron_quantity"];
         $orderData["order_status"] = 0; //0=pending_user_confirmation, 1=pending_payment, 2-payment_made_pending_collector_assignment, 3-Collected, 4-Washing, 5-assigned_for_delivery, 6-completed
@@ -522,8 +530,16 @@ class UserController extends Controller
             ]);
         }
 
+        $payment_verify = UtilController::verifyPayStackTransaction($request->order_id);
+        if($payment_verify->status != "approved" && $request->order_payment_status != "pay_on_pickup") {
+            return response([
+                "status" => "error", 
+                "message" => "Payment verification failed"
+            ]);
+        }
+
         $first_order = Order::where('order_user_id', '=', auth()->user()->user_id)->get()->count();
-        if($first_order == 1 && ($request->order_payment_status == "approved" || $request->order_payment_status == "pay_on_pickup")){
+        if($first_order == 1 && ($payment_verify->status == "approved" || $request->order_payment_status == "pay_on_pickup")){
             $invitors_user_id = User::where('user_referral_code', '=', auth()->user()->user_invitors_referral_code)->first();
             if($invitors_user_id != null){
                 UtilController::giveDiscount(config('app.referral_discount_percentage'), $invitors_user_id->user_id, "MeMaww Auto", false, true, UtilController::getDatePlusOrMinusDays(new DateTime(), "+3 days", "Y-m-d"));
@@ -535,11 +551,11 @@ class UserController extends Controller
 
         
 
-        if($request->order_payment_status == "approved" || $request->order_payment_status == "pay_on_pickup"){
+        if($payment_verify->status == "approved" || $request->order_payment_status == "pay_on_pickup"){
             $the_order->order_status = 1;
             $the_order->order_payment_method = $request->order_payment_method;
-            $the_order->order_payment_status = $request->order_payment_status == "approved" ? 1 : 0;
-            $the_order->order_payment_details = $request->order_payment_details;
+            $the_order->order_payment_status = $payment_verify->status == "approved" ? 1 : 0;
+            $the_order->order_payment_details = $payment_verify->reason;
             $the_order->save();
 
             //UPDATING DISCOUNT CODE USED
@@ -570,7 +586,7 @@ class UserController extends Controller
                 'order_id' => $the_order->order_id,
                 'order_time' => $the_order->created_at,
                 'order_payment_amt' => $the_order->order_user_countrys_currency . $the_order->order_final_price_in_user_countrys_currency,
-                'order_payment_status' => $request->order_payment_status == 1 ? "Paid" : "Pay On Pickup",
+                'order_payment_status' => $payment_verify->status == "approved" ? "Paid" : "Pay On Pickup",
                 'order_lightweightitems_just_wash_quantity' => $the_order->order_lightweightitems_just_wash_quantity,
                 'order_lightweightitems_wash_and_iron_quantity' => $the_order->order_lightweightitems_wash_and_iron_quantity,
                 'order_lightweightitems_just_iron_quantity' => $the_order->order_lightweightitems_just_iron_quantity,
