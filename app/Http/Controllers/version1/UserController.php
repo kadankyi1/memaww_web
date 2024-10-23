@@ -442,8 +442,6 @@ class UserController extends Controller
         $orderData["order_final_price_in_user_countrys_currency"] = $final_price;
         $orderData["order_final_price_in_dollars_at_the_time"] = $final_price/config('app.one_dollar_to_one_ghana_cedi');
 
-        && (($request-> + $request-> + $request->) < 1)
-
         //$orderData["order_dropoff_biker_name"] = "";
         $orderData["order_lightweightitems_just_wash_quantity"] = $validatedData["smallitems_justwash_quantity"];
         $orderData["order_lightweightitems_wash_and_iron_quantity"] = $validatedData["smallitems_washandiron_quantity"];

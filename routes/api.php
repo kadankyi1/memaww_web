@@ -8,12 +8,6 @@ P{2gVVEjYnEFq{,S
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:api');
-
-                                325642.09;1176120.75
-                                325545.29;1176060.96
-                                325597.86;1175975.92
-                                325699.40;1176026.90
-                                364495.95;1199762.43
 */
 
 // LOGIN
