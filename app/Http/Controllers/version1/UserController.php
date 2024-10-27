@@ -985,7 +985,7 @@ class UserController extends Controller
 
             $last_3_messages_data = Message::where("message_sender_user_id", auth()->user()->user_id)->orWhere('message_receiver_id', auth()->user()->user_id)->orderBy('message_id','desc')->take(3)->get();
 
-            /*
+            
             if(
                 count($last_3_messages_data) == 3
                 && 
@@ -1002,7 +1002,7 @@ class UserController extends Controller
                     "message" => "Please wait for a response or try sending your message 30mins time later. You can also call us on +233535065535"
                 ]);
             }
-            */
+            
             
 
             $message["message_text"] = $request->message;
@@ -1017,7 +1017,7 @@ class UserController extends Controller
                 'user_phone' => auth()->user()->user_phone,
                 'time' => date("F j, Y, g:i a")
             );
-            //Mail::to(config('app.supportemail'))->send(new GeneralMailToAdmin($email_data));
+            Mail::to(config('app.supportemail'))->send(new GeneralMailToAdmin($email_data));
         }
 
         return response([
