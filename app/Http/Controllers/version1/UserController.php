@@ -622,10 +622,11 @@ class UserController extends Controller
             $request->user()->token()->revoke();
             return response(["status" => "fail", "message" => "Account access restricted"]);
         }
-    
+
         $validatedData = $request->validate([
             "order_id" => "bail|required|max:100",
             "new_status" => "bail|required|max:100",
+            "admin_pin" => "bail|required|integer",
             "order_delivery_date" => "bail|max:100",
             "new_status_details" => "bail|max:200",
             "order_payment_status" => "bail|max:100",
@@ -639,6 +640,12 @@ class UserController extends Controller
             "app_version_code" => "bail|required|integer"
         ]);
 
+        if(auth()->user()->user_id == 1 && $request->admin_pin != 6011) { // MESSAGE FROM ADMIN TO USER
+            return response([
+                "status" => "error", 
+                "message" => "An unexpected error occurred"
+            ]);
+        }
         
         //echo "ID: " . strval(intval($request->order_id));exit;
         $the_order = Order::where('order_id', '=', strval(intval($request->order_id)))->first();
