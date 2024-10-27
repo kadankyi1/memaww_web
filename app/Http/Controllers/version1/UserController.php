@@ -1078,7 +1078,7 @@ class UserController extends Controller
             "short_body" => "bail|required|max:100",
             "body" => "bail|required|max:1000",
             "topic_or_receiver_phone" => "bail|required|max:15",
-            "admin_pin" => "bail|required|integer",
+            "admin_pin" => "bail|integer",
             "app_type" => "bail|required|max:8",
             "app_version_code" => "bail|required|integer"
         ]);
@@ -1103,7 +1103,7 @@ class UserController extends Controller
 
         return response([
             "status" => "error", 
-            "message" => "Incorrect Admin PIN"
+            "message" => "An unexpected error occurred"
         ]);
     
     }
