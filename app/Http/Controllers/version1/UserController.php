@@ -626,7 +626,7 @@ class UserController extends Controller
         $validatedData = $request->validate([
             "order_id" => "bail|required|max:100",
             "new_status" => "bail|required|max:100",
-            "admin_pin" => "bail|required|integer",
+            "admin_pin" => "bail|integer",
             "order_delivery_date" => "bail|max:100",
             "new_status_details" => "bail|max:200",
             "order_payment_status" => "bail|max:100",
