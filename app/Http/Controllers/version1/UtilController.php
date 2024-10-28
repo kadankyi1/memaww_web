@@ -128,8 +128,8 @@ class UtilController extends Controller
         ];
        
         $notification_tray = [
-                'title'             => "Some title",
-                'body'              => "Some content",
+                'title'             => $title,
+                'body'              => $body,
             ];
        
         $in_app_module = [
@@ -140,6 +140,7 @@ class UtilController extends Controller
        
          $message = [
                'message' => [
+                    'token' => $receiver_key,
                     'notification'     => $notification_tray,
                     'data'             => $in_app_module,
                 ],
