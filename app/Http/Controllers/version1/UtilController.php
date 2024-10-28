@@ -128,12 +128,12 @@ class UtilController extends Controller
             $curl_result = curl_exec($curl_session);
 			
 			
-            /*
+            
             echo "\n\n\n";
 			echo $receiver_key;
 			echo "\n\n\n";
 			var_dump($curl_result);
-            */
+            
             
 			
 			return true;
