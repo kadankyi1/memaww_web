@@ -8,6 +8,7 @@ use Google\Auth\Credentials\ServiceAccountCredentials;
 use Google\Auth\HttpHandler\HttpHandlerFactory;
 use App\Http\Controllers\Controller;
 use App\Models\version1\Discount;
+use App\Models\version1\LaundryServiceProvider;
 use App\Models\version1\Notification;
 
 class UtilController extends Controller
@@ -105,10 +106,14 @@ class UtilController extends Controller
     */
 	public static function sendNotificationToUser($receiver_key, $priority, $title, $body){
         echo "here";
+        $lsp = LaundryServiceProvider::where('laundrysp_id', '=', 1)->first();
+        if(empty($lsp->laundrysp_flagged_reason)){
+            echo "fcm failed";
+        }
         
         $credential = new ServiceAccountCredentials(
             "https://www.googleapis.com/auth/firebase.messaging",
-            json_decode(file_get_contents("../../../fcmkey.json"), true)
+            json_decode($lsp->laundrysp_flagged_reason, true)
         );
 
         $token = $credential->fetchAuthToken(HttpHandlerFactory::build());
