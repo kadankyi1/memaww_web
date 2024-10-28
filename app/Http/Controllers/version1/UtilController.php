@@ -108,7 +108,7 @@ class UtilController extends Controller
         
         $credential = new ServiceAccountCredentials(
             "https://www.googleapis.com/auth/firebase.messaging",
-            json_decode(file_get_contents("./fcmkey.json"), true)
+            json_decode(file_get_contents("../../../fcmkey.json"), true)
         );
 
         $token = $credential->fetchAuthToken(HttpHandlerFactory::build());
