@@ -105,7 +105,7 @@ class UtilController extends Controller
     */
 	public static function sendNotificationToUser($receiver_key, $priority, $title, $body){
         echo "here";
-        require 'vendor/autoload.php';
+        
         $credential = new ServiceAccountCredentials(
             "https://www.googleapis.com/auth/firebase.messaging",
             json_decode(file_get_contents("./fcmkey.json"), true)
