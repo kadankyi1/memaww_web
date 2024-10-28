@@ -3,13 +3,15 @@
 namespace App\Http\Controllers\version1;
 
 use DateTime;
+use Illuminate\Http\Request;
+use Google\Auth\Credentials\ServiceAccountCredentials
 use App\Http\Controllers\Controller;
 use App\Models\version1\Discount;
 use App\Models\version1\Notification;
-use Illuminate\Http\Request;
 
 class UtilController extends Controller
 {
+    
     // GENERATE LOGIN CODE
     public static function generate_passcode()
     {
@@ -101,15 +103,70 @@ class UtilController extends Controller
     |--------------------------------------------------------------------------
     */
 	public static function sendNotificationToUser($receiver_key, $priority, $title, $body){
+        echo "here";
+        require 'vendor/autoload.php';
+        $credential = new ServiceAccountCredentials(
+            "https://www.googleapis.com/auth/firebase.messaging",
+            json_decode(file_get_contents("./fcmkey.json"), true)
+        );
+
+        $token = $credential->fetchAuthToken(HttpHandlerFactory::build());
+
+
+        /////////////////////
+        $apiurl = 'https://fcm.googleapis.com/v1/projects/memaww-d3160/messages:send';   //replace "your-project-id" with...your project ID
+
+        $headers = [
+                'Authorization: Bearer ' . $token["access_token"],
+                'Content-Type: application/json'
+        ];
+       
+        $notification_tray = [
+                'title'             => "Some title",
+                'body'              => "Some content",
+            ];
+       
+        $in_app_module = [
+                "title"          => "",
+                "body"           => "",
+            ];
+        //The $in_app_module array above can be empty - I use this to send variables in to my app when it is opened, so the user sees a popup module with the message additional to the generic task tray notification.
+       
+         $message = [
+               'message' => [
+                    'notification'     => $notification_tray,
+                    'data'             => $in_app_module,
+                ],
+         ];
+       
+         $ch = curl_init();
+         curl_setopt($ch, CURLOPT_URL, $apiurl);
+         curl_setopt($ch, CURLOPT_POST, true);
+         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($message));
+       
+         $result = curl_exec($ch);
+       
+         if ($result === FALSE) {
+             //Failed
+             die('Curl failed: ' . curl_error($ch));
+         }
+       
+         curl_close($ch);
+
+
+        /*
         if(empty($receiver_key)){
             return false;
         }
         $headers = array(
-            'Authorization: Bearer ' . config("app.fcm_server_key"), 
+            'Authorization: Bearer ' . $token["access_token"], 
             'Content-Type:application/json'
         );
         $fields = array(
-            'registration_ids' => array($receiver_key),
+            'token' => "fylpc2NwTSaB7nc84-84Ai:APA91bGv_76T6MdmsEFBoaOiPh8tP1gVkKiMZCCi31En7Fua1nF3_WZNKf2qIACUBAD0IK9HTlOvf9lo1X3J6ZysUFblkqGaUJjnrHfO-U8-FtamlM6fnaU",
             'priority' => $priority,
             'notification' => array(
                 'title' => $title,
@@ -121,7 +178,7 @@ class UtilController extends Controller
             //var_dump($fields);
             $payload = json_encode($fields);
             $curl_session = \curl_init();
-            curl_setopt($curl_session, CURLOPT_URL, "https://fcm.googleapis.com/v1/projects/myproject-b5ae1/messages:send");
+            curl_setopt($curl_session, CURLOPT_URL, "https://fcm.googleapis.com/v1/projects/memaww-d3160/messages:send");
             curl_setopt($curl_session, CURLOPT_POST, true);
             curl_setopt($curl_session, CURLOPT_HTTPHEADER, $headers);
             curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, true);
@@ -140,6 +197,7 @@ class UtilController extends Controller
             
 			
 			return true;
+            */
 
 
 	} 
