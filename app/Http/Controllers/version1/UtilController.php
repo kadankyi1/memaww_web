@@ -105,7 +105,7 @@ class UtilController extends Controller
     |--------------------------------------------------------------------------
     */
 	public static function sendNotificationToUser($receiver_key, $priority, $title, $body){
-        echo "here";
+        //echo "here";
         $lsp = LaundryServiceProvider::where('laundrysp_id', '=', 1)->first();
         if(empty($lsp->laundrysp_flagged_reason)){
             echo "fcm failed";
@@ -156,6 +156,7 @@ class UtilController extends Controller
        
          $result = curl_exec($ch);
        
+         var_dump($result);
          if ($result === FALSE) {
              //Failed
              die('Curl failed: ' . curl_error($ch));
