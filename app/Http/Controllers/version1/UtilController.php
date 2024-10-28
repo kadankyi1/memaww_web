@@ -104,7 +104,10 @@ class UtilController extends Controller
         if(empty($receiver_key)){
             return false;
         }
-        $headers = array('Authorization:key=' . config("app.fcm_server_key"), 'Content-Type:application/json');
+        $headers = array(
+            'Authorization: Bearer ' . config("app.fcm_server_key"), 
+            'Content-Type:application/json'
+        );
         $fields = array(
             'registration_ids' => array($receiver_key),
             'priority' => $priority,
@@ -118,7 +121,7 @@ class UtilController extends Controller
             //var_dump($fields);
             $payload = json_encode($fields);
             $curl_session = \curl_init();
-            curl_setopt($curl_session, CURLOPT_URL, "https://fcm.googleapis.com/fcm/send");
+            curl_setopt($curl_session, CURLOPT_URL, "https://fcm.googleapis.com/v1/projects/myproject-b5ae1/messages:send");
             curl_setopt($curl_session, CURLOPT_POST, true);
             curl_setopt($curl_session, CURLOPT_HTTPHEADER, $headers);
             curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, true);
