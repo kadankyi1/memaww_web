@@ -155,14 +155,17 @@ class UtilController extends Controller
          curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($message));
        
          $result = curl_exec($ch);
+         curl_close($ch);
        
-         var_dump($result);
+         //var_dump($result);
          if ($result === FALSE) {
+            return false;
              //Failed
-             die('Curl failed: ' . curl_error($ch));
+             //die('Curl failed: ' . curl_error($ch));
+         } else {
+            return true;
          }
        
-         curl_close($ch);
 
 
         /*
