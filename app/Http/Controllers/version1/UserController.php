@@ -1254,6 +1254,8 @@ class UserController extends Controller
 
         // MAKING SURE THE INPUT HAS THE EXPECTED VALUES
         $validatedData = $request->validate([
+            "subscription_max_number_of_people_in_home" => "bail|required|integer",
+            "subscription_number_of_months" => "bail|required|integer|digits_between:0,13",
             "app_type" => "bail|required|max:8",
             "app_version_code" => "bail|required|integer"
         ]);
@@ -1269,42 +1271,10 @@ class UserController extends Controller
         }
 
         $subscription_id = "subs_" . auth()->user()->user_id . "_";
-        
-        return response([
-            "status" => "success", 
-            "message" => "Operation successful", 
-            
-            "subscription_id" => $subscription_id, 
-            "user_email" => auth()->user()->user_phone . "@memaww.com", 
-            "txn_narration" => "Laundry subscription by " . auth()->user()->user_last_name . " " . auth()->user()->user_first_name, 
-            "txn_reference" => $subscription_id, 
-            "merchant_id" => config('app.payment_gateway_merchant_id'), 
-            "merchant_api_user" => config('app.payment_gateway_merchant_api_user'), 
-            "merchant_api_key" => config('app.payment_gateway_merchant_api_key'), 
-            "merchant_test_api_key" => config('app.payment_gateway_merchant_test_api_key'), 
-            "return_url" => config('app.url') . "/subscription/" , 
 
-            "currency_symbol" => $subscription_country->country_currency_symbol, 
-            "subscription_country_id" => strval(auth()->user()->user_country_id), 
-            
-            /*
-            "sub_1_to_2_ppl_1month" => strval(305*1), 
-            "sub_3_to_5_ppl_1month" => strval(530*1) , 
-            "sub_6_to_10_ppl_1month" => strval(710*1), 
-            
-            "sub_1_to_2_ppl_3months" => strval(287*3), 
-            "sub_3_to_5_ppl_3months" => strval(502*3), 
-            "sub_6_to_10_ppl_3months" => strval(674*3),
-            
-            "sub_1_to_2_ppl_6months" => strval(278*6), 
-            "sub_3_to_5_ppl_6months" => strval(476*6), 
-            "sub_6_to_10_ppl_6months" => strval(638*6), 
-            
-            "sub_1_to_2_ppl_12months" => strval(260*12), 
-            "sub_3_to_5_ppl_12months" => strval(458*12), 
-            "sub_6_to_10_ppl_12months" => strval(602*12),
-            */
+        $subs_index = "sub_" + $request->subscription_max_number_of_people_in_home + "_ppl_" + $request->subscription_number_of_months + "month";
 
+        $offers_array[$subs_index] = [
             "sub_1_ppl_1month" => strval(217*1), // 0% off
             "sub_2_ppl_1month" => strval(305*1), // 15% off
             "sub_3_ppl_1month" => strval(372*1), // 12% off
@@ -1350,7 +1320,30 @@ class UserController extends Controller
             "sub_8_ppl_12month" => strval(1310*12*0.7), // 13% off  (217 * number of people) - 200
             "sub_9_ppl_12month" => strval(1479*12*0.7), // 14% off (217 * number of people) - 200
             "sub_10_ppl_12month" => strval(1844*12*0.7), // 15% off (217 * number of people) - 200
+        ];
 
+        if(!array_key_exists($subs_index, $offers_array)){
+            return response([
+                "status" => "error", 
+                "message" => "No offer exists for the number of people or months selected. Choose something else."
+            ]);
+        }
+        
+        return response([
+            "status" => "success", 
+            "message" => "Operation successful", 
+            "subscription_id" => $subscription_id, 
+            "user_email" => auth()->user()->user_phone . "@memaww.com", 
+            "txn_narration" => "Laundry subscription by " . auth()->user()->user_last_name . " " . auth()->user()->user_first_name, 
+            "txn_reference" => $subscription_id, 
+            "merchant_id" => config('app.payment_gateway_merchant_id'), 
+            "merchant_api_user" => config('app.payment_gateway_merchant_api_user'), 
+            "merchant_api_key" => config('app.payment_gateway_merchant_api_key'), 
+            "merchant_test_api_key" => config('app.payment_gateway_merchant_test_api_key'), 
+            "return_url" => config('app.url') . "/subscription/" , 
+            "currency_symbol" => $subscription_country->country_currency_symbol, 
+            "subscription_country_id" => strval(auth()->user()->user_country_id), 
+            "subscription_price" => $offers_array[$subs_index],
             "packageinfo1" => "1 pickup and delivery per week", 
             "packageinfo2" => "Unlimited items", 
             "packageinfo3" => "Wash & Fold/Iron",
