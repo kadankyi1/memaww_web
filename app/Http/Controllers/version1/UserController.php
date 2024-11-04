@@ -1373,7 +1373,7 @@ class UserController extends Controller
         $validatedData = $request->validate([
             "subscription_payment_transaction_id" => "bail|required|max:1000",
             "subscription_amount_paid" => "bail|required|integer",
-            "subscription_max_number_of_people_in_home" => "bail|required|integer|digits_between:-1,11",
+            "subscription_max_number_of_people_in_home" => "bail|required|integer",
             "subscription_number_of_months" => "bail|required|integer|digits_between:0,13",
             "subscription_pickup_time" => "bail|required|max:5",
             "subscription_pickup_location" => "bail|required|max:100",
@@ -1382,6 +1382,13 @@ class UserController extends Controller
             "app_type" => "bail|required|max:8",
             "app_version_code" => "bail|required|integer"
         ]);
+
+        if($request->subscription_max_number_of_people_in_home < 1 || $request->subscription_max_number_of_people_in_home > 10) {
+            return response([
+                "status" => "error", 
+                "message" => "The number of people must be from 1 to 10"
+            ]);
+        }
 
         $payment_verify = UtilController::verifyPayStackTransaction($request->subscription_payment_transaction_id);
         if($payment_verify->status != "approved") {
