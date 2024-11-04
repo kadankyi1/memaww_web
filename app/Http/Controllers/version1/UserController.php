@@ -1334,7 +1334,7 @@ class UserController extends Controller
             "message" => "Operation successful", 
             "subscription_id" => $subscription_id, 
             "user_email" => auth()->user()->user_phone . "@memaww.com", 
-            "txn_info" => $request->subscription_max_number_of_people_in_home + " person(s) in-houselhold for " + $request->subscription_number_of_months + " months", 
+            "txn_info" => $request->subscription_max_number_of_people_in_home . " person(s) in-houselhold for " . $request->subscription_number_of_months . " months", 
             "txn_narration" => "Laundry subscription by " . auth()->user()->user_last_name . " " . auth()->user()->user_first_name, 
             "txn_reference" => $subscription_id, 
             "merchant_id" => config('app.payment_gateway_merchant_id'), 
