@@ -1287,6 +1287,7 @@ class UserController extends Controller
             "currency_symbol" => $subscription_country->country_currency_symbol, 
             "subscription_country_id" => strval(auth()->user()->user_country_id), 
             
+            /*
             "sub_1_to_2_ppl_1month" => strval(305*1), 
             "sub_3_to_5_ppl_1month" => strval(530*1) , 
             "sub_6_to_10_ppl_1month" => strval(710*1), 
@@ -1302,7 +1303,53 @@ class UserController extends Controller
             "sub_1_to_2_ppl_12months" => strval(260*12), 
             "sub_3_to_5_ppl_12months" => strval(458*12), 
             "sub_6_to_10_ppl_12months" => strval(602*12),
+            */
 
+            "sub_1_ppl_1month" => strval(217*1), // 0% off
+            "sub_2_ppl_1month" => strval(305*1), // 15% off
+            "sub_3_ppl_1month" => strval(372*1), // 12% off
+            "sub_4_ppl_1month" => strval(563*1), // 12% off
+            "sub_5_ppl_1month" => strval(754*1), // 12% off
+            "sub_6_ppl_1month" => strval(945*1), // 12% off  (217 * number of people) - 200
+            "sub_7_ppl_1month" => strval(1136*1), // 12% off (217 * number of people) - 200
+            "sub_8_ppl_1month" => strval(1310*1), // 13% off  (217 * number of people) - 200
+            "sub_9_ppl_1month" => strval(1479*1), // 14% off (217 * number of people) - 200
+            "sub_10_ppl_1month" => strval(1844*1), // 15% off (217 * number of people) - 200
+
+
+            "sub_1_ppl_3month" => strval(217*3*0.85), // 0% off
+            "sub_2_ppl_3month" => strval(305*3*0.85), // 15% off
+            "sub_3_ppl_3month" => strval(372*3*0.85), // 12% off
+            "sub_4_ppl_3month" => strval(563*3*0.85), // 12% off
+            "sub_5_ppl_3month" => strval(754*3*0.85), // 12% off
+            "sub_6_ppl_3month" => strval(945*3*0.85), // 12% off  (217 * number of people) - 200
+            "sub_7_ppl_3month" => strval(1136*3*0.85), // 12% off (217 * number of people) - 200
+            "sub_8_ppl_3month" => strval(1310*3*0.85), // 13% off  (217 * number of people) - 200
+            "sub_9_ppl_3month" => strval(1479*3*0.85), // 14% off (217 * number of people) - 200
+            "sub_10_ppl_3month" => strval(1844*3*0.85), // 15% off (217 * number of people) - 200
+
+
+            "sub_1_ppl_6month" => strval(217*6*0.75), // 0% off
+            "sub_2_ppl_6month" => strval(305*6*0.75), // 15% off
+            "sub_3_ppl_6month" => strval(372*6*0.75), // 12% off
+            "sub_4_ppl_6month" => strval(563*6*0.75), // 12% off
+            "sub_5_ppl_6month" => strval(754*6*0.75), // 12% off
+            "sub_6_ppl_6month" => strval(945*6*0.75), // 12% off  (217 * number of people) - 200
+            "sub_7_ppl_6month" => strval(1136*6*0.75), // 12% off (217 * number of people) - 200
+            "sub_8_ppl_6month" => strval(1310*6*0.75), // 13% off  (217 * number of people) - 200
+            "sub_9_ppl_6month" => strval(1479*6*0.75), // 14% off (217 * number of people) - 200
+            "sub_10_ppl_6month" => strval(1844*6*0.75), // 15% off (217 * number of people) - 200
+
+            "sub_1_ppl_12month" => strval(217*12*0.7), // 0% off
+            "sub_2_ppl_12month" => strval(305*12*0.7), // 15% off
+            "sub_3_ppl_12month" => strval(372*12*0.7), // 12% off
+            "sub_4_ppl_12month" => strval(563*12*0.7), // 12% off
+            "sub_5_ppl_12month" => strval(754*12*0.7), // 12% off
+            "sub_6_ppl_12month" => strval(945*12*0.7), // 12% off  (217 * number of people) - 200
+            "sub_7_ppl_12month" => strval(1136*12*0.7), // 12% off (217 * number of people) - 200
+            "sub_8_ppl_12month" => strval(1310*12*0.7), // 13% off  (217 * number of people) - 200
+            "sub_9_ppl_12month" => strval(1479*12*0.7), // 14% off (217 * number of people) - 200
+            "sub_10_ppl_12month" => strval(1844*12*0.7), // 15% off (217 * number of people) - 200
 
             "packageinfo1" => "1 pickup and delivery per week", 
             "packageinfo2" => "Unlimited items", 
@@ -1354,22 +1401,53 @@ class UserController extends Controller
         }
 
         if(
-            ($request->subscription_max_number_of_people_in_home == "2" && $request->subscription_number_of_months == "1" && $request->subscription_amount_paid != strval(305*1))
-            || ($request->subscription_max_number_of_people_in_home == "5" && $request->subscription_number_of_months == "1" && $request->subscription_amount_paid != strval(530*1))
-            || ($request->subscription_max_number_of_people_in_home == "10" && $request->subscription_number_of_months == "1" && $request->subscription_amount_paid != strval(710*1))
-            || ($request->subscription_max_number_of_people_in_home == "2" && $request->subscription_number_of_months == "3" && $request->subscription_amount_paid != strval(287*3))
-            || ($request->subscription_max_number_of_people_in_home == "5" && $request->subscription_number_of_months == "3" && $request->subscription_amount_paid != strval(502*3))
-            || ($request->subscription_max_number_of_people_in_home == "10" && $request->subscription_number_of_months == "3" && $request->subscription_amount_paid != strval(674*3))
-            || ($request->subscription_max_number_of_people_in_home == "2" && $request->subscription_number_of_months == "6" && $request->subscription_amount_paid != strval(278*6))
-            || ($request->subscription_max_number_of_people_in_home == "5" && $request->subscription_number_of_months == "6" && $request->subscription_amount_paid != strval(476*6))
-            || ($request->subscription_max_number_of_people_in_home == "10" && $request->subscription_number_of_months == "6" && $request->subscription_amount_paid != strval(638*6))
-            || ($request->subscription_max_number_of_people_in_home == "2" && $request->subscription_number_of_months == "12" && $request->subscription_amount_paid != strval(260*12))
-            || ($request->subscription_max_number_of_people_in_home == "5" && $request->subscription_number_of_months == "12" && $request->subscription_amount_paid != strval(458*12))
-            || ($request->subscription_max_number_of_people_in_home == "10" && $request->subscription_number_of_months == "12" && $request->subscription_amount_paid != strval(602*12))
+            ($request->subscription_max_number_of_people_in_home == "1" && $request->subscription_number_of_months == "1" && $payment_verify->amount != strval(217*1))
+            || ($request->subscription_max_number_of_people_in_home == "2" && $request->subscription_number_of_months == "1" && $payment_verify->amount != strval(305*1))
+            || ($request->subscription_max_number_of_people_in_home == "3" && $request->subscription_number_of_months == "1" && $payment_verify->amount != strval(372*1))
+            || ($request->subscription_max_number_of_people_in_home == "4" && $request->subscription_number_of_months == "1" && $payment_verify->amount != strval(563*1))
+            || ($request->subscription_max_number_of_people_in_home == "5" && $request->subscription_number_of_months == "1" && $payment_verify->amount != strval(754*1))
+            || ($request->subscription_max_number_of_people_in_home == "6" && $request->subscription_number_of_months == "1" && $payment_verify->amount != strval(945*1))
+            || ($request->subscription_max_number_of_people_in_home == "7" && $request->subscription_number_of_months == "1" && $payment_verify->amount != strval(1136*1))
+            || ($request->subscription_max_number_of_people_in_home == "8" && $request->subscription_number_of_months == "1" && $payment_verify->amount != strval(1310*1))
+            || ($request->subscription_max_number_of_people_in_home == "9" && $request->subscription_number_of_months == "1" && $payment_verify->amount != strval(1479*1))
+            || ($request->subscription_max_number_of_people_in_home == "10" && $request->subscription_number_of_months == "1" && $payment_verify->amount != strval(1844*1))
+
+            || ($request->subscription_max_number_of_people_in_home == "1" && $request->subscription_number_of_months == "3" && $payment_verify->amount != strval(217*3*0.85))
+            || ($request->subscription_max_number_of_people_in_home == "2" && $request->subscription_number_of_months == "3" && $payment_verify->amount != strval(305*3*0.85))
+            || ($request->subscription_max_number_of_people_in_home == "3" && $request->subscription_number_of_months == "3" && $payment_verify->amount != strval(372*3*0.85))
+            || ($request->subscription_max_number_of_people_in_home == "4" && $request->subscription_number_of_months == "3" && $payment_verify->amount != strval(563*3*0.85))
+            || ($request->subscription_max_number_of_people_in_home == "5" && $request->subscription_number_of_months == "3" && $payment_verify->amount != strval(754*3*0.85))
+            || ($request->subscription_max_number_of_people_in_home == "6" && $request->subscription_number_of_months == "3" && $payment_verify->amount != strval(945*3*0.85))
+            || ($request->subscription_max_number_of_people_in_home == "7" && $request->subscription_number_of_months == "3" && $payment_verify->amount != strval(1136*3*0.85))
+            || ($request->subscription_max_number_of_people_in_home == "8" && $request->subscription_number_of_months == "3" && $payment_verify->amount != strval(1310*3*0.85))
+            || ($request->subscription_max_number_of_people_in_home == "9" && $request->subscription_number_of_months == "3" && $payment_verify->amount != strval(1479*3*0.85))
+            || ($request->subscription_max_number_of_people_in_home == "10" && $request->subscription_number_of_months == "3" && $payment_verify->amount != strval(1844*3*0.85))
+
+            || ($request->subscription_max_number_of_people_in_home == "1" && $request->subscription_number_of_months == "6" && $payment_verify->amount != strval(217*6*0.75))
+            || ($request->subscription_max_number_of_people_in_home == "2" && $request->subscription_number_of_months == "6" && $payment_verify->amount != strval(305*6*0.75))
+            || ($request->subscription_max_number_of_people_in_home == "3" && $request->subscription_number_of_months == "6" && $payment_verify->amount != strval(372*6*0.75))
+            || ($request->subscription_max_number_of_people_in_home == "4" && $request->subscription_number_of_months == "6" && $payment_verify->amount != strval(563*6*0.75))
+            || ($request->subscription_max_number_of_people_in_home == "5" && $request->subscription_number_of_months == "6" && $payment_verify->amount != strval(754*6*0.75))
+            || ($request->subscription_max_number_of_people_in_home == "6" && $request->subscription_number_of_months == "6" && $payment_verify->amount != strval(945*6*0.75))
+            || ($request->subscription_max_number_of_people_in_home == "7" && $request->subscription_number_of_months == "6" && $payment_verify->amount != strval(1136*6*0.75))
+            || ($request->subscription_max_number_of_people_in_home == "8" && $request->subscription_number_of_months == "6" && $payment_verify->amount != strval(1310*6*0.75))
+            || ($request->subscription_max_number_of_people_in_home == "9" && $request->subscription_number_of_months == "6" && $payment_verify->amount != strval(1479*6*0.75))
+            || ($request->subscription_max_number_of_people_in_home == "10" && $request->subscription_number_of_months == "6" && $payment_verify->amount != strval(1844*6*0.75))
+
+            || ($request->subscription_max_number_of_people_in_home == "1" && $request->subscription_number_of_months == "12" && $payment_verify->amount != strval(217*12*0.7))
+            || ($request->subscription_max_number_of_people_in_home == "2" && $request->subscription_number_of_months == "12" && $payment_verify->amount != strval(305*12*0.7))
+            || ($request->subscription_max_number_of_people_in_home == "3" && $request->subscription_number_of_months == "12" && $payment_verify->amount != strval(372*12*0.7))
+            || ($request->subscription_max_number_of_people_in_home == "4" && $request->subscription_number_of_months == "12" && $payment_verify->amount != strval(563*12*0.7))
+            || ($request->subscription_max_number_of_people_in_home == "5" && $request->subscription_number_of_months == "12" && $payment_verify->amount != strval(754*12*0.7))
+            || ($request->subscription_max_number_of_people_in_home == "6" && $request->subscription_number_of_months == "12" && $payment_verify->amount != strval(945*12*0.7))
+            || ($request->subscription_max_number_of_people_in_home == "7" && $request->subscription_number_of_months == "12" && $payment_verify->amount != strval(1136*12*0.7))
+            || ($request->subscription_max_number_of_people_in_home == "8" && $request->subscription_number_of_months == "12" && $payment_verify->amount != strval(1310*12*0.7))
+            || ($request->subscription_max_number_of_people_in_home == "9" && $request->subscription_number_of_months == "12" && $payment_verify->amount != strval(1479*12*0.7))
+            || ($request->subscription_max_number_of_people_in_home == "10" && $request->subscription_number_of_months == "12" && $payment_verify->amount != strval(1844*12*0.7))
             ){
                 return response([
                     "status" => "error", 
-                    "message" => "Subscription offer expired. Your payment will be refunded within 24 hours."
+                    "message" => "Payment inconsistency detected. Your payment will be investigated and refunded."
                 ]);
         }
 
