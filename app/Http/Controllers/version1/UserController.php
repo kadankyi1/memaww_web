@@ -1269,8 +1269,16 @@ class UserController extends Controller
                 "message" => "User currency not found"
             ]);
         }
-
-        $subscription_id = sprintf("%012d", auth()->user()->user_id . date('YmdHis'));
+        /*
+        $last_subscription = Subscription::orderBy('created_at', 'desc')->first();
+        if(empty($subscription_country->country_currency_symbol)){
+            return response([
+                "status" => "error", 
+                "message" => "User currency not found"
+            ]);
+        }
+        */
+        $subscription_id = sprintf("%012d", auth()->user()->user_id . date('ymdis'));
 
         $subs_index = "sub_" . $request->subscription_max_number_of_people_in_home . "_ppl_" . $request->subscription_number_of_months . "month";
 
