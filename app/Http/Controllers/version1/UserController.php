@@ -1259,7 +1259,6 @@ class UserController extends Controller
             "subscription_pickup_time" => "bail|required|max:5",
             "subscription_pickup_location" => "bail|required|max:100",
             "subscription_package_description" => "bail|required|max:100",
-            "subscription_country_id" => "bail|required|integer",
             "app_type" => "bail|required|max:8",
             "app_version_code" => "bail|required|integer"
         ]);
@@ -1352,7 +1351,7 @@ class UserController extends Controller
         $subscriptionData["subscription_pickup_time"] = $validatedData["subscription_pickup_time"];
         $subscriptionData["subscription_pickup_location"] = $validatedData["subscription_pickup_location"];
         $subscriptionData["subscription_package_description"] = $validatedData["subscription_package_description"]; 
-        $subscriptionData["subscription_country_id"] = $validatedData["subscription_country_id"];
+        $subscriptionData["subscription_country_id"] = auth()->user()->user_country_id;
         $subscriptionData["subscription_user_id"] = auth()->user()->user_id;
         Subscription::create($subscriptionData);
 
@@ -1413,7 +1412,7 @@ class UserController extends Controller
                 "message" => "User not found"
             ]);
         }
-        
+
         $this_subscription = Subscription::where('subscription_payment_transaction_id', '=', $request->subscription_payment_transaction_id)->first();
 
         if($this_subscription === null){
