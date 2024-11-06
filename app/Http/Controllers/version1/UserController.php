@@ -1511,6 +1511,7 @@ class UserController extends Controller
         $subscriptionData["subscription_user_id"] = auth()->user()->user_id;
         $this_subscription = Subscription::create($subscriptionData);
         */
+        $this_subscription->subscription_payment_response = $payment_verify->reason;
         $this_subscription->subscription_package_description = $request->subscription_package_description;
         $this_subscription->save();
         $user1->subscription_id = $this_subscription->subscription_id;
