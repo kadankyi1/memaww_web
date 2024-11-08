@@ -34,7 +34,7 @@ class Subscription extends Model
         //define accessor
         public function getSubscriptionInfoAttribute()
         {
-            return "Your subscription ends on " . UtilController::getDatePlusOrMinusDays($this->created_at, "+3 days", "F j, Y");
+            return "Your subscription ends on " . UtilController::getDatePlusOrMinusDays($this->created_at, "+30 days", "F j, Y");
         }
 
         //define accessor
