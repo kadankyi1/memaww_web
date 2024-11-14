@@ -8,6 +8,7 @@ use App\Models\version1\User;
 use App\Http\Controllers\Controller;
 use App\Mail\version1\GeneralMailToAdmin;
 use App\Mail\version1\NewOrderMailToAdmin;
+use App\Mail\version1\NewSubscriptionMailToAdmin;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\version1\RequestCollectionCallbackMailToAdmin;
 use App\Models\version1\CollectionCallBack;
@@ -1516,6 +1517,22 @@ class UserController extends Controller
         $this_subscription->save();
         $user1->subscription_id = $this_subscription->subscription_id;
         $user1->save();
+
+        $email_data = array(
+            'subs_id' => $this_subscription->subscription_id,
+            'subs_time' => date("F j, Y, g:i a"),
+            'num_of_people' => $this_subscription->subscription_max_number_of_people_in_home,
+            'num_of_months' => $this_subscription->subscription_number_of_months,
+            'pickup_location' => $this_subscription->subscription_pickup_location,
+            'pickup_time' => $this_subscription->subscription_pickup_time . ", - " . $this_subscription->subscription_pickup_day,
+            'user_name' => auth()->user()->user_first_name . " " . auth()->user()->user_last_name,
+            'user_id' => auth()->user()->user_id,
+            'user_phone' => auth()->user()->user_phone,
+            'subs_payment_amt' => $this_subscription->getSubscriptionCurrencyAttribute() . $this_subscription->subscription_amount_paid,
+            'subs_payment_status' => $payment_verify->reason,
+            'time' => date("F j, Y, g:i a")
+        );
+        Mail::to(config('app.supportemail'))->send(new NewSubscriptionMailToAdmin($email_data));
 
         return response([
             "status" => "success", 
