@@ -62,7 +62,7 @@ return [
     'iosminvc' => env('IOS_MIN_ALLOWED_VERSION_CODE', '1'),
 
     // ANDROID APP MAXIMUM VERSION ALLOWED
-    'androidmaxvc' => env('ANDROID_MAX_VERSION_CODE', '1'),
+    'androidmaxvc' => env('ANDROID_MAX_VERSION_CODE', '3'),
 
     // iOS APP MAXIMUM VERSION ALLOWED
     'iosmaxvc' => env('IOS_MAX_VERSION_CODE', '1'),
