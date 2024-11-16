@@ -56,13 +56,13 @@ return [
     'supportemail' => env('SUPPORT_EMAIL', 'support@memaww.com'),
 
     // ANDROID APP MINIMUM VERSION ALLOWED
-    'androidminvc' => env('ANDROID_MIN_ALLOWED_VERSION_CODE', '1'),
+    'androidminvc' => env('ANDROID_MIN_ALLOWED_VERSION_CODE', '5'),
+
+    // ANDROID APP MAXIMUM VERSION ALLOWED
+    'androidmaxvc' => env('ANDROID_MAX_VERSION_CODE', '5'),
 
     // iOS APP MINIMUM VERSION ALLOWED
     'iosminvc' => env('IOS_MIN_ALLOWED_VERSION_CODE', '1'),
-
-    // ANDROID APP MAXIMUM VERSION ALLOWED
-    'androidmaxvc' => env('ANDROID_MAX_VERSION_CODE', '3'),
 
     // iOS APP MAXIMUM VERSION ALLOWED
     'iosmaxvc' => env('IOS_MAX_VERSION_CODE', '1'),
