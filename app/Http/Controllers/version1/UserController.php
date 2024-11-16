@@ -1158,14 +1158,14 @@ class UserController extends Controller
         if (strtoupper($request->app_type) == "ANDROID" && 
             (intval($request->app_version_code) < intval(config('app.androidminvc')) || $request->app_version_code > intval(config('app.androidmaxvc')) ) 
         ) {
-            $request->user()->token()->revoke();
+            //$request->user()->token()->revoke();
             return response(["status" => "fail", "message" => "Please update your app from the Google Play Store", "subscription_set" => false]);
         }
 
         if (strtoupper($request->app_type) == "IOS" && 
             (intval($request->app_version_code) < intval(config('app.iosminvc')) || $request->app_version_code > intval(config('app.iosmaxvc')) ) 
         ) {
-            $request->user()->token()->revoke();
+            //$request->user()->token()->revoke();
             return response(["status" => "fail", "message" => "Please update your app from the App Store", "subscription_set" => false]);
         }
 
