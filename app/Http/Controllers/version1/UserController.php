@@ -56,7 +56,7 @@ class UserController extends Controller
 
         
         if(UtilController::checkUserAppVersionCode($request->app_type, $request->app_version_code)["status"] == "update"){
-            return response(UtilController::checkUserAppVersionCode($request->app_type, $request->app_version_code));
+            //return response(UtilController::checkUserAppVersionCode($request->app_type, $request->app_version_code));
         }
 
         if(strtoupper($request->app_type) != "IOS" && strtoupper($request->app_type)  != "ANDROID"){
@@ -1428,7 +1428,7 @@ class UserController extends Controller
         if(UtilController::checkUserAppVersionCode($request->app_type, $request->app_version_code)["status"] == "update"){
             return response(UtilController::checkUserAppVersionCode($request->app_type, $request->app_version_code));
         }
-        
+
         $user1 = User::where('user_id', '=', auth()->user()->user_id)->first();
 
         if($user1 === null){
