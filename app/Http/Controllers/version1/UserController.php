@@ -1155,8 +1155,9 @@ class UserController extends Controller
             "app_version_code" => "bail|required|integer"
         ]);
 
-        if(UtilController::checkUserAppVersionCode($request->app_type, $request->app_version_code)["success"] == "update"){
-            return response(UtilController::checkUserAppVersionCode($request->app_type, $request->app_version_code));
+        $appCheck = UtilController::checkUserAppVersionCode($request->app_type, $request->app_version_code);
+        if($appCheck["success"] == "update"){
+            return response($appCheck);
         }
 
         $user1 = User::where('user_id', '=', auth()->user()->user_id)->first();

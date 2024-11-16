@@ -28,13 +28,13 @@ class UtilController extends Controller
             (intval($app_version_code) < intval(config('app.androidminvc')) || $app_version_code > intval(config('app.androidmaxvc')) ) 
         ) {
 
-            return ["status" => "update", "message" => "Please update your app from the Google Play Store", "subscription_set" => false];
+            return json_encode(["status" => "update", "message" => "Please update your app from the Google Play Store", "subscription_set" => false]);
 
         } else if (strtoupper($app_type) == "IOS" && 
             (intval($app_version_code) < intval(config('app.iosminvc')) || $app_version_code > intval(config('app.iosmaxvc')) ) 
         ) {
 
-            return ["status" => "update", "message" => "Please update your app from the App Store", "subscription_set" => false];
+            return json_encode(["status" => "update", "message" => "Please update your app from the App Store", "subscription_set" => false];
 
         } else {
             return ["status" => "pass"];
