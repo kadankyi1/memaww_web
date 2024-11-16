@@ -492,10 +492,6 @@ class UserController extends Controller
             "app_version_code" => "bail|required|integer"
         ]);
 
-        
-        if(UtilController::checkUserAppVersionCode($request->app_type, $request->app_version_code)["status"] == "update"){
-            return response(UtilController::checkUserAppVersionCode($request->app_type, $request->app_version_code));
-        }
 
         //echo "ID: " . strval(intval($request->order_id));exit;
         $the_order = Order::where('order_id', '=', strval(intval($request->order_id)))->first();
@@ -631,11 +627,6 @@ class UserController extends Controller
             "app_type" => "bail|required|max:8",
             "app_version_code" => "bail|required|integer"
         ]);
-
-
-        if(UtilController::checkUserAppVersionCode($request->app_type, $request->app_version_code)["status"] == "update"){
-            return response(UtilController::checkUserAppVersionCode($request->app_type, $request->app_version_code));
-        }
 
         if(auth()->user()->user_id != 1 || $request->admin_pin != 6011) { // MESSAGE FROM ADMIN TO USER
             return response([
@@ -1095,10 +1086,6 @@ class UserController extends Controller
             "app_version_code" => "bail|required|integer"
         ]);
 
-        if(UtilController::checkUserAppVersionCode($request->app_type, $request->app_version_code)["status"] == "update"){
-            return response(UtilController::checkUserAppVersionCode($request->app_type, $request->app_version_code));
-        }
-
         if($request->admin_pin == 6011) { // MESSAGE FROM ADMIN TO USER
             UtilController::addNotificationToUserQueue($request->title, $request->body, $request->topic_or_receiver_phone, $request->admin_pin);
             if($request->topic_or_receiver_phone == "ALL_USERS" || $request->topic_or_receiver_phone == "ANDROID_USERS" || $request->topic_or_receiver_phone == "IPHONE_USERS"){
@@ -1285,6 +1272,10 @@ class UserController extends Controller
         ]);
 
         
+        if(UtilController::checkUserAppVersionCode($request->app_type, $request->app_version_code)["status"] == "update"){
+            return response(UtilController::checkUserAppVersionCode($request->app_type, $request->app_version_code));
+        }
+        
         $subscription_country = Country::where('country_id', '=', auth()->user()->user_country_id)->first();
 
         if(empty($subscription_country->country_currency_symbol)){
@@ -1424,10 +1415,6 @@ class UserController extends Controller
             "app_type" => "bail|required|max:8",
             "app_version_code" => "bail|required|integer"
         ]);
-
-        if(UtilController::checkUserAppVersionCode($request->app_type, $request->app_version_code)["status"] == "update"){
-            return response(UtilController::checkUserAppVersionCode($request->app_type, $request->app_version_code));
-        }
         
         $user1 = User::where('user_id', '=', auth()->user()->user_id)->first();
 
