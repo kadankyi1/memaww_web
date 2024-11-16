@@ -52,6 +52,9 @@ return [
     |
     */
 
+    // GOOGLE PLAY STORE APP ID EMAIL
+    'google_playstore_appid' => env('GOOGLE_PLAYSTORE_APPID', 'org.christecclesia.pjdigitalpool'),
+
     // SUPPORT EMAIL
     'supportemail' => env('SUPPORT_EMAIL', 'support@memaww.com'),
 
