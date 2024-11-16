@@ -59,7 +59,7 @@ return [
     'supportemail' => env('SUPPORT_EMAIL', 'support@memaww.com'),
 
     // ANDROID APP MINIMUM VERSION ALLOWED
-    'androidminvc' => env('ANDROID_MIN_ALLOWED_VERSION_CODE', '5'),
+    'androidminvc' => env('ANDROID_MIN_ALLOWED_VERSION_CODE', '4'),
 
     // ANDROID APP MAXIMUM VERSION ALLOWED
     'androidmaxvc' => env('ANDROID_MAX_VERSION_CODE', '5'),
