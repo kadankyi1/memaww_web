@@ -1149,7 +1149,7 @@ class UserController extends Controller
         }
     
         $validatedData = $request->validate([
-            "fcm_token" => "bail|required|max:1000",
+            "fcm_token" => "max:1000",
             "fcm_type" => "bail|required|max:7",
             "app_type" => "bail|required|max:8",
             "app_version_code" => "bail|required|integer"
@@ -1195,19 +1195,12 @@ class UserController extends Controller
             $user_subscription = null;
         }
 
-        if($request->fcm_type == "ANDROID"){
+        if($request->fcm_type == "ANDROID" && !empty($request->fcm_token)){
             $user1->user_notification_token_android = $request->fcm_token;
             $user1->save();
-        } else if($request->fcm_type == "IPHONE"){
+        } else if($request->fcm_type == "IPHONE" && !empty($request->fcm_token)){
             $user1->user_notification_token_ios = $request->fcm_token;
             $user1->save();
-        } else {
-            return response([
-                "status" => "error", 
-                "message" => "FCM type unknown",
-                "subscription_set" => $subscription_set,
-                "subscription" => $user_subscription
-            ]);
         }
 
         if(strtoupper($request->app_type) == "ANDROID"){
