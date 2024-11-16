@@ -20,6 +20,23 @@ class UtilController extends Controller
         return rand(10000,99999);
     }
 
+
+    public static function checkUserAppVersionCode($app_type, $app_version_code)
+    {
+
+        if (strtoupper($app_type) == "ANDROID" && 
+            (intval($app_version_code) < intval(config('app.androidminvc')) || $app_version_code > intval(config('app.androidmaxvc')) ) 
+        ) {
+            return response(["status" => "fail", "message" => "Please update your app from the Google Play Store", "subscription_set" => false]);
+        } else if (strtoupper($app_type) == "IOS" && 
+            (intval($app_version_code) < intval(config('app.iosminvc')) || $app_version_code > intval(config('app.iosmaxvc')) ) 
+        ) {
+            //$user()->token()->revoke();
+            return response(["status" => "fail", "message" => "Please update your app from the App Store", "subscription_set" => false]);
+        }
+
+    }
+
     /*
     |--------------------------------------------------------------------------
     |--------------------------------------------------------------------------

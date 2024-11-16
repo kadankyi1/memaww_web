@@ -1155,6 +1155,8 @@ class UserController extends Controller
             "app_version_code" => "bail|required|integer"
         ]);
 
+        UtilController::checkUserAppVersionCode($request->app_type, $request->app_version_code);
+
         if (strtoupper($request->app_type) == "ANDROID" && 
             (intval($request->app_version_code) < intval(config('app.androidminvc')) || $request->app_version_code > intval(config('app.androidmaxvc')) ) 
         ) {
