@@ -1140,12 +1140,12 @@ class UserController extends Controller
 
     public function updateUserInfo(Request $request){
         if (!Auth::guard('api')->check() || !$request->user()->tokenCan("use-mobile-apps-as-normal-user")) {
-            return response(["status" => "fail", "message" => "Permission Denied. Please log out and login again", "subscription_set" => false]);
+            return response(["status" => "fail", "message" => "Permission Denied. Please log out and login again", "subscription_set" => false, "app_link" => ""]);
         }
 
         if (auth()->user()->user_flagged) {
             $request->user()->token()->revoke();
-            return response(["status" => "fail", "message" => "Account access restricted", "subscription_set" => false]);
+            return response(["status" => "fail", "message" => "Account access restricted", "subscription_set" => false, "app_link" => ""]);
         }
     
         $validatedData = $request->validate([
@@ -1166,7 +1166,8 @@ class UserController extends Controller
             return response([
                 "status" => "error", 
                 "message" => "User not found", 
-                "subscription_set" => false
+                "subscription_set" => false, 
+                "app_link" => ""
             ]);
         }
 
@@ -1214,7 +1215,8 @@ class UserController extends Controller
                 "min_vc" => config('app.androidminvc'), 
                 "message" => "Success",
                 "subscription_set" => $subscription_set,
-                "subscription" => $user_subscription
+                "subscription" => $user_subscription, 
+                "app_link" => ""
             ]);
 
         } else if(strtoupper($request->app_type) == "IOS"){
@@ -1224,14 +1226,16 @@ class UserController extends Controller
             "min_vc" => config('app.iosminvc'), 
             "message" => "Success",
             "subscription_set" => $subscription_set,
-            "subscription" => $user_subscription
+            "subscription" => $user_subscription, 
+            "app_link" => ""
             ]);
 
         } else {
             return response([
                 "status" => "error", 
                 "message" => "Device unknown",
-                "subscription_set" => $subscription_set
+                "subscription_set" => $subscription_set, 
+                "app_link" => ""
             ]);
         }
 
