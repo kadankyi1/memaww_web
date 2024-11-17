@@ -1265,6 +1265,7 @@ class UserController extends Controller
         $validatedData = $request->validate([
             "subscription_max_number_of_people_in_home" => "bail|required|integer",
             "subscription_number_of_months" => "bail|required|integer|digits_between:0,13",
+            "subscription_pickup_day" => "bail|required|max:9",
             "subscription_pickup_time" => "bail|required|max:5",
             "subscription_pickup_location" => "bail|required|max:100",
             "app_type" => "bail|required|max:8",
@@ -1354,7 +1355,7 @@ class UserController extends Controller
         
         $subscriptionData["subscription_items_washed"] = 0;
         $subscriptionData["subscription_pickups_done"] = 0;
-        $subscriptionData["subscription_pickup_day"] = "Saturday";
+        $subscriptionData["subscription_pickup_day"] = $validatedData["subscription_pickup_day"];
         $subscriptionData["subscription_payment_transaction_id"] = $subscription_id;
         $subscriptionData["subscription_payment_response"] = "pending";
         $subscriptionData["subscription_amount_paid"] = $offers_array[$subs_index];
