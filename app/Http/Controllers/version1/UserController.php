@@ -1457,6 +1457,7 @@ class UserController extends Controller
             ]);
         }
 
+        /*
         if(
             ($request->subscription_max_number_of_people_in_home == "1" && $request->subscription_number_of_months == "1" && $payment_verify->amount != strval(0.10))
             || ($request->subscription_max_number_of_people_in_home == "2" && $request->subscription_number_of_months == "1" && $payment_verify->amount != strval(305*1))
@@ -1507,23 +1508,8 @@ class UserController extends Controller
                     "message" => "Payment inconsistency detected. Your payment will be investigated and refunded."
                 ]);
         }
-
-        /*
-        $subscriptionData["subscription_items_washed"] = 0;
-        $subscriptionData["subscription_pickups_done"] = 0;
-        $subscriptionData["subscription_pickup_day"] = "Saturday";
-        $subscriptionData["subscription_payment_transaction_id"] = $validatedData["subscription_payment_transaction_id"];
-        $subscriptionData["subscription_payment_response"] = $payment_verify->reason;
-        $subscriptionData["subscription_amount_paid"] = $validatedData["subscription_amount_paid"];
-        $subscriptionData["subscription_max_number_of_people_in_home"] = $validatedData["subscription_max_number_of_people_in_home"];
-        $subscriptionData["subscription_number_of_months"] = $validatedData["subscription_number_of_months"];
-        $subscriptionData["subscription_pickup_time"] = $validatedData["subscription_pickup_time"];
-        $subscriptionData["subscription_pickup_location"] = $validatedData["subscription_pickup_location"];
-        $subscriptionData["subscription_package_description"] = $validatedData["subscription_package_description"]; 
-        $subscriptionData["subscription_country_id"] = $validatedData["subscription_country_id"];
-        $subscriptionData["subscription_user_id"] = auth()->user()->user_id;
-        $this_subscription = Subscription::create($subscriptionData);
         */
+        
         $this_subscription->subscription_payment_response = $payment_verify->reason;
         $this_subscription->subscription_package_description = $request->subscription_package_description;
         $this_subscription->save();
