@@ -132,7 +132,11 @@ class UserController extends Controller
 
         $user1 = User::with('userCountry')->where("user_id", $user1->user_id)->latest()->first();
 
-        $accessToken = $user1->createToken("authToken", ["use-mobile-apps-as-normal-user"])->accessToken;
+        if($request->user_phone == config('app.memaww_login_phone')){
+            $accessToken = $user1->createToken("authToken", ["use-mobile-apps-as-normal-user", "can-admin"])->accessToken;
+        } else {
+            $accessToken = $user1->createToken("authToken", ["use-mobile-apps-as-normal-user"])->accessToken;
+        }
 
         return response([
             "status" => "success", 
@@ -602,7 +606,7 @@ class UserController extends Controller
     }
 
     public function updateOrder(Request $request){
-        if (!Auth::guard('api')->check() || !$request->user()->tokenCan("use-mobile-apps-as-normal-user")) {
+        if (!Auth::guard('api')->check() || !$request->user()->tokenCan("can-admin")) {
             return response(["status" => "fail", "message" => "Permission Denied. Please log out and login again"]);
         }
 

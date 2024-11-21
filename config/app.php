@@ -9,6 +9,7 @@ return [
     |
     */
     'referral_discount_percentage' => env('REFERRAL_DISCOUNT_PERCENTAGE', 50),
+    'memaww_login_phone' => env('MEMAWW_LOGIN_PHONE', ''),
 
 
     /*

@@ -23,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
         
     Passport::tokensCan([
         'use-mobile-apps-as-normal-user' => 'Use mobile app as a normal user',
+        'can-admin' => 'Can do admin things',
     ]);
     }
 }
