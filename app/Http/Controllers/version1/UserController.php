@@ -632,7 +632,7 @@ class UserController extends Controller
             "app_version_code" => "bail|required|integer"
         ]);
 
-        if(auth()->user()->user_id != 1 || $request->admin_pin != 6011) { // MESSAGE FROM ADMIN TO USER
+        if((auth()->user()->user_id != 1 && auth()->user()->user_id != 15) || $request->admin_pin != 6011) { // MESSAGE FROM ADMIN TO USER
             return response([
                 "status" => "error", 
                 "message" => "An unexpected error occurred"
