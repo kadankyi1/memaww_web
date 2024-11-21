@@ -823,7 +823,7 @@ class UserController extends Controller
         else {
             return response([
                 "status" => "error", 
-                "message" => "Set information right. Order status: " . $the_order->order_status_message
+                "message" => "Set information right. Order status: " . $the_order->order_status . " - "  . $the_order->order_status_message
             ]);
         }
 
