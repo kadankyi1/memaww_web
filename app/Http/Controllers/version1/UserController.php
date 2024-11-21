@@ -796,7 +796,7 @@ class UserController extends Controller
         }
 
         // OTHER STATUS
-        else if($the_order->order_status == 0 && intval($request->new_status) == 7){ // CANCELLING ORDER
+        else if(($the_order->order_status == 0 || $the_order->order_status == 1) && intval($request->new_status) == 7){ // CANCELLING ORDER
             if(empty($request->new_status_details)){
                 return response([
                     "status" => "error", 
