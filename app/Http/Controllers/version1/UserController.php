@@ -143,6 +143,7 @@ class UserController extends Controller
             "message" => "Sign-in successful",
             "user_phone_local" => $request->user_phone,
             "access_token" => $accessToken,
+            "android_app_link" => config('app.google_playstore_appid'),
             "user" => $user1,
         ]);
 
