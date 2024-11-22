@@ -402,7 +402,7 @@ class UserController extends Controller
                 $discount_amount = $final_price * (($discount1[0]->discount_percentage)/100);
                 $discount_amount_usd = $discount_amount/config('app.one_dollar_to_one_ghana_cedi');
                 $final_price =  $final_price * ((100-$discount1[0]->discount_percentage)/100);
-        }
+            }
             
             $final_price = strval($final_price);
             
@@ -533,11 +533,15 @@ class UserController extends Controller
         if($first_order == 1 && ($payment_verify->status == "approved" || $request->order_payment_status == "pay_on_pickup")){
             $invitors_user_id = User::where('user_referral_code', '=', auth()->user()->user_invitors_referral_code)->first();
             if($invitors_user_id != null){
-                UtilController::giveDiscount(config('app.referral_discount_percentage'), $invitors_user_id->user_id, "MeMaww Auto", false, true, UtilController::getDatePlusOrMinusDays(new DateTime(), "+3 days", "Y-m-d"));
+                UtilController::giveDiscount(config('app.referral_discount_percentage'), $invitors_user_id->user_id, "MeMaww Auto", false, true, UtilController::getDatePlusOrMinusDays(new DateTime(), "+7 days", "Y-m-d"));
                 UtilController::addNotificationToUserQueue("You have a discount", "Someone you referred placed an order so we gave you a discount.", $invitors_user_id->user_phone, 6011);
                 UtilController::sendNotificationToUser($invitors_user_id->user_notification_token_android,"normal","Discount Received - MeMaww", "Someone you referred placed an order so we gave you a discount.");
                 UtilController::sendNotificationToUser($invitors_user_id->user_notification_token_ios,"normal","Discount Received - MeMaww", "Someone you referred placed an order so we gave you a discount.");    
             }
+            UtilController::giveDiscount(config('app.referral_discount_percentage'), auth()->user()->user_id, "MeMaww Auto", false, true, UtilController::getDatePlusOrMinusDays(new DateTime(), "+7 days", "Y-m-d"));
+            UtilController::addNotificationToUserQueue("You have a discount", "Here's a discount as a thank you for your first order.", auth()->user()->user_phone, 6011);
+            UtilController::sendNotificationToUser(auth()->user()->user_notification_token_android,"normal","Discount Received - MeMaww", "Here's a discount as a thank you for your first order.");
+            UtilController::sendNotificationToUser(auth()->user()->user_notification_token_ios,"normal","Discount Received - MeMaww", "Here's a discount as a thank you for your first order.");  
         }
 
         
