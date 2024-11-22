@@ -27,6 +27,11 @@ Wash & Fold: {{ $email_data['order_lightweightitems_just_wash_quantity'] }}
 <br>Wash & Iron: {{ $email_data['order_lightweightitems_wash_and_iron_quantity'] }}
 <br>Just Iron: {{ $email_data['order_lightweightitems_just_iron_quantity'] }}
 
+# Medium Weight Items - Total: {{ $email_data['order_total_lightweight_items'] }}
+Wash & Fold: {{ $email_data['order_mediumweightitems_just_wash_quantity'] }}
+<br>Wash & Iron: {{ $email_data['order_mediumweightitems_wash_and_iron_quantity'] }}
+<br>Just Iron: {{ $email_data['order_mediumweightitems_just_iron_quantity'] }}
+
 
 # Heavy Weight Items - Total: {{ $email_data['order_total_bulkyweight_items'] }}
 Wash & Fold: {{ $email_data['order_bulkyitems_just_wash_quantity'] }}
