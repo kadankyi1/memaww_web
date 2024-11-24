@@ -432,7 +432,7 @@ class UserController extends Controller
         $orderData["order_discount_id"] = $discount_id;
         $orderData["order_discount_amount_in_user_countrys_currency"] = $discount_amount;
         $orderData["order_discount_amount_in_dollars_at_the_time"] = $discount_amount_usd;
-        $orderData["order_final_price_in_user_countrys_currency"] = 0.10; //$final_price;
+        $orderData["order_final_price_in_user_countrys_currency"] = $final_price;
         $orderData["order_final_price_in_dollars_at_the_time"] = $final_price/config('app.one_dollar_to_one_ghana_cedi');
 
         //$orderData["order_dropoff_biker_name"] = "";
@@ -461,9 +461,9 @@ class UserController extends Controller
             "original_price" => $userCountry->country_currency_symbol . strval($original_price), 
             "discount_percentage" => strval($discount_percentage) . "%", 
             "discount_amount" => $userCountry->country_currency_symbol . strval($discount_amount), 
-            "price_final" => $userCountry->country_currency_symbol . strval(0.10), //strval($final_price), 
-            "price_final_no_currency" => strval(0.10), //strval($final_price), 
-            "price_final_no_currency_long" => sprintf("%012d", strval(0.10)),  //sprintf("%012d", strval($final_price)), 
+            "price_final" => $userCountry->country_currency_symbol . strval($final_price), 
+            "price_final_no_currency" => strval($final_price), 
+            "price_final_no_currency_long" => sprintf("%012d", strval($final_price)), 
             "user_email" => auth()->user()->user_phone . "@memaww.com", 
             "txn_narration" => "Laundry pickup request by " . auth()->user()->user_last_name . " " . auth()->user()->user_first_name, 
             "txn_reference" => sprintf("%012d", $order->order_id), 
