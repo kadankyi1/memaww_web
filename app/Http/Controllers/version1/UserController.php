@@ -213,7 +213,7 @@ class UserController extends Controller
         
         $final_price = 0;
         $pay_online = "yes";
-        $pay_on_pickup = "yes";
+        $pay_on_pickup = "no";
         $discount_percentage = 0;
         $discount_amount = 0;
         $discount_amount_usd = 0;
