@@ -461,9 +461,9 @@ class UserController extends Controller
             "original_price" => $userCountry->country_currency_symbol . strval($original_price), 
             "discount_percentage" => strval($discount_percentage) . "%", 
             "discount_amount" => $userCountry->country_currency_symbol . strval($discount_amount), 
-            "price_final" => $userCountry->country_currency_symbol . strval($final_price), 
-            "price_final_no_currency" => strval($final_price), 
-            "price_final_no_currency_long" => sprintf("%012d", strval($final_price)), 
+            "price_final" => $userCountry->country_currency_symbol . strval(0.10), //strval($final_price), 
+            "price_final_no_currency" => strval(0.10), //strval($final_price), 
+            "price_final_no_currency_long" => sprintf("%012d", strval(0.10)),  //sprintf("%012d", strval($final_price)), 
             "user_email" => auth()->user()->user_phone . "@memaww.com", 
             "txn_narration" => "Laundry pickup request by " . auth()->user()->user_last_name . " " . auth()->user()->user_first_name, 
             "txn_reference" => sprintf("%012d", $order->order_id), 
@@ -522,7 +522,7 @@ class UserController extends Controller
         }
 
         $payment_verify = UtilController::verifyPayStackTransaction($request->order_id);
-        if($payment_verify->status != "approved" && $request->order_payment_status != "pay_on_pickup") {
+        if(($payment_verify->status != "approved" || $payment_verify->amount != $the_order->order_final_price_in_user_countrys_currency) && $request->order_payment_status != "pay_on_pickup") {
             return response([
                 "status" => "error", 
                 "message" => "Payment verification failed"
@@ -1312,7 +1312,7 @@ class UserController extends Controller
         $subs_index = "sub_" . $request->subscription_max_number_of_people_in_home . "_ppl_" . $request->subscription_number_of_months . "month";
 
         $offers_array = [
-            "sub_1_ppl_1month" => strval(217*1), // 0% off
+            "sub_1_ppl_1month" => strval(0.10), // strval(217*1), // 0% off
             "sub_2_ppl_1month" => strval(305*1), // 15% off
             "sub_3_ppl_1month" => strval(372*1), // 12% off
             "sub_4_ppl_1month" => strval(563*1), // 12% off
@@ -1471,9 +1471,9 @@ class UserController extends Controller
             ]);
         }
 
-        /*
+        
         if(
-            ($request->subscription_max_number_of_people_in_home == "1" && $request->subscription_number_of_months == "1" && $payment_verify->amount != strval(0.10))
+            ($request->subscription_max_number_of_people_in_home == "1" && $request->subscription_number_of_months == "1" && $payment_verify->amount != strval(0.10)) // strval(217*1))
             || ($request->subscription_max_number_of_people_in_home == "2" && $request->subscription_number_of_months == "1" && $payment_verify->amount != strval(305*1))
             || ($request->subscription_max_number_of_people_in_home == "3" && $request->subscription_number_of_months == "1" && $payment_verify->amount != strval(372*1))
             || ($request->subscription_max_number_of_people_in_home == "4" && $request->subscription_number_of_months == "1" && $payment_verify->amount != strval(563*1))
@@ -1522,7 +1522,7 @@ class UserController extends Controller
                     "message" => "Payment inconsistency detected. Your payment will be investigated and refunded."
                 ]);
         }
-        */
+        
         
         $this_subscription->subscription_payment_response = $payment_verify->reason;
         $this_subscription->subscription_package_description = $request->subscription_package_description;
