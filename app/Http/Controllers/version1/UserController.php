@@ -1565,7 +1565,7 @@ class UserController extends Controller
         }
     
         $validatedData = $request->validate([
-            "day_of_the_week" => "bail|integer",
+            "day_of_the_week" => "bail|max:10",
             "admin_pin" => "bail|integer",
             "app_type" => "bail|required|max:8",
             "app_version_code" => "bail|required|integer"
