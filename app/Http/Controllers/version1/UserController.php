@@ -1312,7 +1312,7 @@ class UserController extends Controller
         $subs_index = "sub_" . $request->subscription_max_number_of_people_in_home . "_ppl_" . $request->subscription_number_of_months . "month";
 
         $offers_array = [
-            "sub_1_ppl_1month" => strval(0.10), // strval(217*1), // 0% off
+            "sub_1_ppl_1month" => strval(217*1), // 0% off
             "sub_2_ppl_1month" => strval(305*1), // 15% off
             "sub_3_ppl_1month" => strval(372*1), // 12% off
             "sub_4_ppl_1month" => strval(563*1), // 12% off
@@ -1473,7 +1473,7 @@ class UserController extends Controller
 
         
         if(
-            ($request->subscription_max_number_of_people_in_home == "1" && $request->subscription_number_of_months == "1" && $payment_verify->amount != strval(0.10)) // strval(217*1))
+            ($request->subscription_max_number_of_people_in_home == "1" && $request->subscription_number_of_months == "1" && $payment_verify->amount != strval(217*1))
             || ($request->subscription_max_number_of_people_in_home == "2" && $request->subscription_number_of_months == "1" && $payment_verify->amount != strval(305*1))
             || ($request->subscription_max_number_of_people_in_home == "3" && $request->subscription_number_of_months == "1" && $payment_verify->amount != strval(372*1))
             || ($request->subscription_max_number_of_people_in_home == "4" && $request->subscription_number_of_months == "1" && $payment_verify->amount != strval(563*1))
