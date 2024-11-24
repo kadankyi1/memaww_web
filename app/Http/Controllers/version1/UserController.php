@@ -591,6 +591,7 @@ class UserController extends Controller
                 'order_bulkyitems_just_wash_quantity' => $the_order->order_bulkyitems_just_wash_quantity,
                 'order_bulkyitems_wash_and_iron_quantity' => $the_order->order_bulkyitems_wash_and_iron_quantity,
                 'order_total_lightweight_items' => $the_order->order_lightweightitems_just_wash_quantity + $the_order->order_lightweightitems_wash_and_iron_quantity + $the_order->order_lightweightitems_just_iron_quantity,
+                'order_total_mediumweight_items' => $the_order->order_mediumitems_justwash_quantity + $the_order->order_mediumitems_washandiron_quantity + $the_order->order_mediumitems_justiron_quantity,
                 'order_total_bulkyweight_items' => $the_order->order_bulkyitems_just_wash_quantity + $the_order->order_bulkyitems_wash_and_iron_quantity,
                 'order_total_items' => $the_order->order_lightweightitems_just_wash_quantity + $the_order->order_lightweightitems_wash_and_iron_quantity + $the_order->order_lightweightitems_just_iron_quantity + $the_order->order_bulkyitems_just_wash_quantity + $the_order->order_bulkyitems_wash_and_iron_quantity,
                 'time' => date("F j, Y, g:i a")
@@ -1553,5 +1554,41 @@ class UserController extends Controller
     
     }
 
+    public function getTodaysSubscriptionPickups(Request $request){
+        if (!Auth::guard('api')->check() || !$request->user()->tokenCan("can-admin")) {
+            return response(["status" => "fail", "message" => "Permission Denied. Please log out and login again"]);
+        }
+    
+        if (auth()->user()->user_flagged) {
+            $request->user()->token()->revoke();
+            return response(["status" => "fail", "message" => "Account access restricted"]);
+        }
+    
+        $validatedData = $request->validate([
+            "day_of_the_week" => "bail|integer",
+            "admin_pin" => "bail|integer",
+            "app_type" => "bail|required|max:8",
+            "app_version_code" => "bail|required|integer"
+        ]);
+    
+        if((auth()->user()->user_id != 1 && auth()->user()->user_id != 15) || $request->admin_pin != 6011) { // MESSAGE FROM ADMIN TO USER
+            return response([
+                "status" => "error", 
+                "message" => "An unexpected error occurred"
+            ]);
+        }
+        
+        //echo "ID: " . strval(intval($request->order_id));exit;
+        $thirty_days_ago = date('Y-m-d', strtotime("-30 days")); 
+        $subscriptions = Subscription::where('subscription_pickup_day', (empty($request->day_of_the_week)) ? date('l') : $request->day_of_the_week)->whereDate('created_at', "<=" , $thirty_days_ago)->get(); 
 
+        return response([
+            "status" => "success", 
+            "message" => "Operation successful", 
+            "subscriptions" => $subscriptions
+        ]);
+
+    }
+    
 }
+

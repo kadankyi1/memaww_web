@@ -48,3 +48,6 @@ Route::middleware('auth:api')->post('/v1/user/get-subscription-pricing', [App\Ht
 
 // GET MY MESSAGES
 Route::middleware('auth:api')->post('/v1/user/set-user-subscription', [App\Http\Controllers\version1\UserController::class, 'setUserSubscription']);
+
+// GET MY MESSAGES
+Route::middleware('auth:api')->post('/v1/user/get-todays-subscription-pickups', [App\Http\Controllers\version1\UserController::class, 'getTodaysSubscriptionPickups']);
