@@ -1579,7 +1579,7 @@ class UserController extends Controller
         }
         
         //echo "ID: " . strval(intval($request->order_id));exit;
-        $thirty_days_ago = date('Y-m-d', strtotime("-30 days")); 
+        $thirty_days_ago = date('Y-m-d', strtotime("+30 days")); 
         $subscriptions = Subscription::where('subscription_pickup_day', (empty($request->day_of_the_week)) ? date('l') : $request->day_of_the_week)->whereDate('created_at', "<=" , $thirty_days_ago)->get(); 
 
         return response([
