@@ -45,16 +45,33 @@ class UserController extends Controller
 
         // MAKING SURE THE INPUT HAS THE EXPECTED VALUES
         $validatedData = $request->validate([
-            "user_country" => "bail|required|max:100",
-            "user_phone" => "bail|required|max:10",
-            "user_first_name" => "bail|required|max:100",
-            "user_last_name" => "bail|required|max:100",
+            "user_country" => "bail|max:100",
+            "user_phone" => "bail|max:10",
+            "user_first_name" => "bail|max:100",
+            "user_last_name" => "bail|max:100",
             "invite_code" => "bail|max:15",
             "app_type" => "bail|required|max:8",
             "app_version_code" => "bail|required|integer"
         ]);
 
         
+        if(empty($request->user_first_name) || empty($request->user_last_name)){
+            return response([
+                "status" => "error", 
+                "message" => "You did not enter your first and last name"
+            ]);
+        } else if(empty($request->user_phone) || strlen($request->user_country) != 10){
+            return response([
+                "status" => "error", 
+                "message" => "Phone number has to be 10 digits"
+            ]);
+        } else if(empty($request->user_country)){
+            return response([
+                "status" => "error", 
+                "message" => "You did not choose your country"
+            ]);
+        }
+
         if(UtilController::checkUserAppVersionCode($request->app_type, $request->app_version_code)["status"] == "update"){
             return response(UtilController::checkUserAppVersionCode($request->app_type, $request->app_version_code));
         }
@@ -63,13 +80,6 @@ class UserController extends Controller
             return response([
                 "status" => "error", 
                 "message" => "Please update your app."
-                ]);
-        }
-
-        if(strlen($request->user_country) != 10){
-            return response([
-                "status" => "error", 
-                "message" => "Phone number has to be 10 digits"
                 ]);
         }
 
