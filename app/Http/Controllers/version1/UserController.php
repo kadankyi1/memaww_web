@@ -60,7 +60,7 @@ class UserController extends Controller
                 "status" => "error", 
                 "message" => "You did not enter your first and last name"
             ]);
-        } else if(empty($request->user_phone) || strlen($request->user_country) != 10){
+        } else if(empty($request->user_phone) || strlen($request->user_phone) != 10){
             return response([
                 "status" => "error", 
                 "message" => "Phone number has to be 10 digits"
