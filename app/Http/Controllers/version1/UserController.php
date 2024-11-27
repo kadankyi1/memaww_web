@@ -66,6 +66,13 @@ class UserController extends Controller
                 ]);
         }
 
+        if(strlen($request->user_country) != 10){
+            return response([
+                "status" => "error", 
+                "message" => "Phone number has to be 10 digits"
+                ]);
+        }
+
         $user_country = Country::where('country_real_name', '=', $request->user_country)->first();
         if($user_country === null){
             return response([
