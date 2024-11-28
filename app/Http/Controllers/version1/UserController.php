@@ -1418,6 +1418,8 @@ class UserController extends Controller
             "packageinfo2" => "Unlimited items", 
             "packageinfo3" => "Wash & Fold/Iron",
             "packageinfo4" => "Delivery in 48hrs", 
+            "user_email" => auth()->user()->user_phone . "@memaww.com", 
+            "merchant_test_api_key" => config('app.payment_gateway_merchant_test_api_key'), 
         ]);
 
     }
