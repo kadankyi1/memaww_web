@@ -1490,7 +1490,7 @@ class UserController extends Controller
 
         
         if(
-            ($request->subscription_max_number_of_people_in_home == "1" && $request->subscription_number_of_months == "1" && $payment_verify->amount != strval(217*1))
+            ($request->subscription_max_number_of_people_in_home == "1" && $request->subscription_number_of_months == "1" && $payment_verify->amount != strval(0.10)) //strval(217*1))
             || ($request->subscription_max_number_of_people_in_home == "2" && $request->subscription_number_of_months == "1" && $payment_verify->amount != strval(305*1))
             || ($request->subscription_max_number_of_people_in_home == "3" && $request->subscription_number_of_months == "1" && $payment_verify->amount != strval(372*1))
             || ($request->subscription_max_number_of_people_in_home == "4" && $request->subscription_number_of_months == "1" && $payment_verify->amount != strval(563*1))
