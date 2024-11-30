@@ -1324,7 +1324,7 @@ class UserController extends Controller
             ]);
         }
         */
-        $subscription_id = sprintf("%012d", auth()->user()->user_id . date('ymdis'));
+        $subscription_id = sprintf("%012d", auth()->user()->user_id . date('ymis'));
 
         $subs_index = "sub_" . $request->subscription_max_number_of_people_in_home . "_ppl_" . $request->subscription_number_of_months . "month";
 
