@@ -1414,7 +1414,7 @@ class UserController extends Controller
             "currency_symbol" => $subscription_country->country_currency_symbol, 
             "subscription_country_id" => strval(auth()->user()->user_country_id), 
             "subscription_price" => $offers_array[$subs_index],
-            "subscription_price_ios" => sprintf("%012d", ceil($offers_array[$subs_index])),
+            "subscription_price_ios" => sprintf("%012d", (intval($offers_array[$subs_index]) * 10)),
             "packageinfo1" => "1 pickup and delivery per week", 
             "packageinfo2" => "Unlimited items", 
             "packageinfo3" => "Wash & Fold/Iron",
