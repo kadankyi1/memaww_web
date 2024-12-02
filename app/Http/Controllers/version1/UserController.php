@@ -541,10 +541,12 @@ class UserController extends Controller
 
         $payment_verify = UtilController::verifyPayStackTransaction($request->order_id);
         if(($payment_verify->status != "approved" || $payment_verify->amount != $the_order->order_final_price_in_user_countrys_currency) && $request->order_payment_status != "pay_on_pickup") {
-            return response([
-                "status" => "error", 
-                "message" => "Payment verification failed"
-            ]);
+            if(!$request->purge){
+                return response([
+                    "status" => "error", 
+                    "message" => "Payment verification failed"
+                ]);
+            }
         }
 
         $first_order = Order::where('order_user_id', '=', auth()->user()->user_id)->get()->count();
