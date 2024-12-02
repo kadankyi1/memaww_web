@@ -1259,7 +1259,7 @@ class UserController extends Controller
         } else if(strtoupper($request->app_type) == "IOS"){
 
             return response([
-            "status" => "error", 
+            "status" => "success", 
             "min_vc" => config('app.iosminvc'), 
             "message" => "Success",
             "subscription_set" => $subscription_set,
