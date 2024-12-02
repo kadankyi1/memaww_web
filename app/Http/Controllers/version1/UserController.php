@@ -421,7 +421,7 @@ class UserController extends Controller
                 $final_price =  $final_price * ((100-$discount1[0]->discount_percentage)/100);
             }
             
-            $final_price = strval($final_price);
+            $final_price = strval(ceil($final_price));
             
         } else {
             return response([
@@ -479,6 +479,7 @@ class UserController extends Controller
             "discount_percentage" => strval($discount_percentage) . "%", 
             "discount_amount" => $userCountry->country_currency_symbol . strval($discount_amount), 
             "price_final" => $userCountry->country_currency_symbol . strval($final_price), 
+            "price_final_ios" => sprintf("%012d", (intval($final_price) * 10)),
             "price_final_no_currency" => strval($final_price), 
             "price_final_no_currency_long" => sprintf("%012d", strval($final_price)), 
             "user_email" => auth()->user()->user_phone . "@memaww.com", 
