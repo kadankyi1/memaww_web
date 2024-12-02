@@ -449,7 +449,7 @@ class UserController extends Controller
         $orderData["order_discount_id"] = $discount_id;
         $orderData["order_discount_amount_in_user_countrys_currency"] = $discount_amount;
         $orderData["order_discount_amount_in_dollars_at_the_time"] = $discount_amount_usd;
-        $orderData["order_final_price_in_user_countrys_currency"] = $final_price;
+        $orderData["order_final_price_in_user_countrys_currency"] = 0.10; //$final_price;
         $orderData["order_final_price_in_dollars_at_the_time"] = $final_price/config('app.one_dollar_to_one_ghana_cedi');
 
         //$orderData["order_dropoff_biker_name"] = "";
