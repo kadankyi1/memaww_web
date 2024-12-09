@@ -44,7 +44,7 @@
       <ul class="navbar-nav ml-auto">
         <li class="nav-item"><a href="/" class="nav-link">Order</a></li>
         <li class="nav-item"><a href="/#apps" class="nav-link">iOS App</a></li>
-        <li class="nav-item"><a href="/#apps" class="nav-link">Android App</a></li>
+        <li class="nav-item"><a href="https://play.google.com/store/apps/details?id=com.memaww.memaww" class="nav-link">Android App</a></li>
         <li class="nav-item active"><a href="/contact" class="nav-link">Contact</a></li>
       </ul>
      </div>
@@ -146,7 +146,7 @@
         <div class="ftco-footer-widget pt-md-5 mb-4">
           <h2 class="ftco-heading-2">Apps & Links</h2>
           <ul class="list-unstyled">
-            <li><a href="#" class="py-2 d-block">Android App</a></li>
+            <li><a href="https://play.google.com/store/apps/details?id=com.memaww.memaww" class="py-2 d-block">Android App</a></li>
             <li><a href="#" class="py-2 d-block">iOs App</a></li>
             <li><a href="https://infodefa.com" class="py-2 d-block">Parent Company</a></li>
           </ul>
