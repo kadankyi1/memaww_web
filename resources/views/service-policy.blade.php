@@ -73,15 +73,18 @@
          <p style="color: rgb(89, 89, 89)">We enjoy bringing this service to you and we care for your laundry just like we would ours, however we still need to agree to some rules to ensure that there are no misunderstandings about the &ldquo;Memaww&rdquo; service here (referred to as &quot;we,&quot; &quot;us,&quot; &quot;our&quot;, &quot;MeMaww&quot;, or &ldquo;InfoDeFa Company Ltd&rdquo;) or your obligations. By using our service, you acknowledge and accept our Service Policy.</p>
          
          <br><strong>ITEM CLASSIFICATION</strong>
-         <p style="color: rgb(89, 89, 89)">To make pricing simple, we have classified items into 2 main categories. They are:</p>
+         <p style="color: rgb(89, 89, 89)">To make pricing simple, we have classified items into 3 main categories. They are:</p>
           <ul>
             <li>Lightweight Items</li>
+            <li>Mediumweight Items</li>
             <li>Heavyweight Items</li>
           </ul>
          
-         <p style="color: rgb(89, 89, 89)">Lightweight Items refers to any item that weighs below 2kg. They usually include shirts, trousers, skirts, shorts, handkerchiefs, pillow cases, etc. Most of the items we wear as clothes fall in this category</p>
+          <p style="color: rgb(89, 89, 89)">Lightweight Items refers to any item that weighs below 0.1 kilograms. They usually include shirts, trousers, skirts, shorts, handkerchiefs, pillow cases, etc. Most of the items we wear as clothes fall in this category</p>
+          
+          <p style="color: rgb(89, 89, 89)">Mediumweight Items refers to items that weighs between 0.1 and 0.7 kilograms. They usually include shirts, trousers, skirts, shorts, handkerchiefs, pillow cases, etc. Most of the items we wear as clothes fall in this category</p>
          
-         <p style="color: rgb(89, 89, 89)">Heavyweight Items refers to any item that weighs 2kg or more. They usually include duvets, bedsheets.</p>
+         <p style="color: rgb(89, 89, 89)">Heavyweight Items refers to any item that weighs 0.8 kilograms or more. They usually include duvets, bedsheets.</p>
          
          <br><strong>SERVICE TYPES</strong>
          <ul>
