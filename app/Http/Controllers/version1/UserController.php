@@ -186,7 +186,7 @@ class UserController extends Controller
 
         $validatedData = $request->validate([
             "collect_loc_raw" => "bail|max:100",
-            "collect_loc_gps" => "bail|max:22",
+            "collect_loc_gps" => "bail|max:50",
             "collect_datetime" => "bail|max:5",
             "contact_person_phone" => "bail|max:10",
             "drop_loc_raw" => "bail|max:100",
