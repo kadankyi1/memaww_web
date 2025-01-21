@@ -1542,7 +1542,8 @@ class UserController extends Controller
                     "status" => "error", 
                     "subscription_max_number_of_people_in_home" => $request->subscription_max_number_of_people_in_home, 
                     "subscription_number_of_months" => $request->subscription_number_of_months, 
-                    "payment_verify_amount" => $payment_verify->amount, 
+                    "payment_verify_amount" => floatval($payment_verify->amount), 
+                    "checking_for_amount" => floatval(1), 
                     "message" => "Payment inconsistency detected. Your payment will be investigated and refunded."
                 ]);
         }
