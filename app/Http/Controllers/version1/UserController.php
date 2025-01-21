@@ -1540,6 +1540,9 @@ class UserController extends Controller
             ){
                 return response([
                     "status" => "error", 
+                    "subscription_max_number_of_people_in_home" => $request->subscription_max_number_of_people_in_home, 
+                    "subscription_number_of_months" => $request->subscription_number_of_months, 
+                    "payment_verify_amount" => $payment_verify->amount, 
                     "message" => "Payment inconsistency detected. Your payment will be investigated and refunded."
                 ]);
         }
