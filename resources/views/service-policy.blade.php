@@ -80,11 +80,11 @@
             <li>Heavyweight Items</li>
           </ul>
          
-          <p style="color: rgb(89, 89, 89)">Lightweight Items refers to any item that weighs below 0.1 kilograms. They usually include handkerchiefs, face towels, underwear, pillow cases, etc.</p>
+          <p style="color: rgb(89, 89, 89)">Lightweight Items refers to any item that weighs below 0.1 kilograms. They usually include handkerchiefs, face towels, underwear and pillow cases.</p>
           
-          <p style="color: rgb(89, 89, 89)">Mediumweight Items refers to items that weighs from 0.1 to below 0.8 kilograms. They usually include shirts, trousers, skirts, shorts, handkerchiefs, pillow cases, etc. Most of the items we wear as clothes fall in this category</p>
+          <p style="color: rgb(89, 89, 89)">Mediumweight Items refers to items that weighs from 0.1 to below 0.8 kilograms. They usually include shirts, trousers, and skirts</p>
          
-         <p style="color: rgb(89, 89, 89)">Heavyweight Items refers to any item that weighs 0.8 kilograms or more. They usually include duvets, bedsheets.</p>
+         <p style="color: rgb(89, 89, 89)">Heavyweight Items refers to any item that weighs 0.8 kilograms or more. They usually include duvets, bedsheets and heavy suits.</p>
          
          <br><strong>SERVICE TYPES</strong>
          <ul>
