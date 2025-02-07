@@ -18,6 +18,11 @@ Route::get('/service-policy', function () {
     return view('service-policy');
 });
 
+
+Route::get('/fair-usage-policy', function () {
+    return view('fair-usage-policy');
+});
+
 Route::get('/welcome', function () {
     return view('welcome');
 });
