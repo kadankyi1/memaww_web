@@ -70,7 +70,12 @@
        <div class="w-100">
          <h3>SERVICE POLICY</h3>
 
-         <p style="color: rgb(89, 89, 89)">We enjoy bringing this service to you and we care for your laundry just like we would ours, however we still need to agree to some rules to ensure that there are no misunderstandings about the &ldquo;Memaww&rdquo; service here (referred to as &quot;we,&quot; &quot;us,&quot; &quot;our&quot;, &quot;MeMaww&quot;, or &ldquo;InfoDeFa Company Ltd&rdquo;) or your obligations. By using our service, you acknowledge and accept our Service Policy.</p>
+         <p style="color: rgb(89, 89, 89)">
+            We enjoy bringing this service to you and we care for your laundry just like we would ours,
+             however we still need to agree to some rules to ensure that there are no misunderstandings about the &ldquo;Memaww&rdquo; 
+             service here (referred to as &quot;we,&quot; &quot;us,&quot; &quot;our&quot;, &quot;MeMaww&quot;, or &ldquo;InfoDeFa Company Ltd&rdquo;) 
+             or your obligations. By using our service, you acknowledge and accept our Service Policy.
+            </p>
          
          <br><strong>ITEM CLASSIFICATION</strong>
          <p style="color: rgb(89, 89, 89)">To make pricing simple, we have classified items into 3 main categories. They are:</p>
@@ -143,10 +148,16 @@
          
          <p style="color: rgb(89, 89, 89)"></p>
          
+         <br><strong>FAIR USAGE POLICY</strong>
+         <p style="color: rgb(89, 89, 89)">
+            You agree to use our service in line with our fair usage policy. <a href="/fair-usage-policy" class="py-2 d-block">Read here</a>
+         </p>
+         
+         
          <br><strong>MISCELLANEOUS</strong>
          <p style="color: rgb(89, 89, 89)">
             As our business changes, we may want to modify some terms in this agreement. Therefore, we encourage you to check back frequently to familiarize yourself with any changes.</p>
-         
+            
          <p style="color: rgb(89, 89, 89)">Although we think we are generally agreeable people, we recognize that MeMaww and you may have a dispute. In this event, you agree that any legal action pertaining to this agreement, or MeMaww generally, shall be conducted in the Courts of the Republic of Ghana.</p>
          
          <p style="color: rgb(89, 89, 89)"></p>
