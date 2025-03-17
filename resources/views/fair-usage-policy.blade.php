@@ -72,24 +72,13 @@
 
          <p style="color: rgb(89, 89, 89)">
             Customers shall use our services including subscriptions in a fair manner and not misuse them in anyway. 
-            
-            Big Laundry finds any of its laundry or dry cleaning packages being misused, for any other purpose other than residential purpose or use, 
-            Big Laundry reserves the right to terminate the subscription with immediate effect and will not be obliged or liable to refund the money paid 
-            for the subscription.
-        </p>
-         
-         <br><strong>OUR RIGHT TO CANCEL</strong>
-         
-          <p style="color: rgb(89, 89, 89)">
-            Should there be any instances of misuse, MeMaww reserves the right and at its sole discretion to accept, reject and or cancel 
-            a service including subscriptions.
         </p>
         
         <br><strong>INSTANCES OF UNFAIR USAGE OF SUBSCRIPTION SERVICES</strong>
         <ul>
-           <li>Wash &amp; Fold: We simply wash your items and fold them. This can either be water washed or dry cleaned.</li>
-           <li>Wash &amp; Iron: We wash items and iron items, folding or putting on hangers if necessary.</li>
-           <li>Just Iron: We iron items, folding or putting on hangers if necessary..</li>
+           <li>Requesting pickup and laundry for items you did not use within the week.</li>
+           <li>Requesting pickup and laundry for items not belonging or used by the subscriber and their addon users</li>
+           <li>Requesting extra pickup than allowed in your subcription.</li>
         </ul>
 
 
@@ -99,6 +88,13 @@
            <li>Wash &amp; Iron: We wash items and iron items, folding or putting on hangers if necessary.</li>
            <li>Just Iron: We iron items, folding or putting on hangers if necessary..</li>
         </ul>
+         
+        <br><strong>OUR RIGHT TO CANCEL</strong>
+        
+         <p style="color: rgb(89, 89, 89)">
+           Should there be any instances of misuse, MeMaww reserves the right and at its sole discretion to accept, reject and or cancel 
+           a service including subscriptions.
+       </p>
          
          <p style="color: rgb(89, 89, 89)"></p>
       </div>
