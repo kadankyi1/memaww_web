@@ -81,7 +81,7 @@
        <span class="fa fa-phone"></span>
      </div>
      <h3 class="mb-2">Contact Number</h3>
-     <p><a href="tel://+233535065535">+233(0) 53 506 5535</a></p>
+     <p><a href="tel://+233538815095">+233 53 881 5595</a></p>
    </div>
  </div>
  <div class="col-md-4 d-flex">
