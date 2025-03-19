@@ -54,16 +54,16 @@ return [
     */
 
     // GOOGLE PLAY STORE APP ID EMAIL
-    'google_playstore_appid' => env('GOOGLE_PLAYSTORE_APPID', 'org.christecclesia.pjdigitalpool'),
+    'google_playstore_appid' => env('GOOGLE_PLAYSTORE_APPID', 'com.memaww.memaww'),
 
     // SUPPORT EMAIL
     'supportemail' => env('SUPPORT_EMAIL', 'support@memaww.com'),
 
     // ANDROID APP MINIMUM VERSION ALLOWED
-    'androidminvc' => env('ANDROID_MIN_ALLOWED_VERSION_CODE', '4'),
+    'androidminvc' => env('ANDROID_MIN_ALLOWED_VERSION_CODE', '5'),
 
     // ANDROID APP MAXIMUM VERSION ALLOWED
-    'androidmaxvc' => env('ANDROID_MAX_VERSION_CODE', '4'),
+    'androidmaxvc' => env('ANDROID_MAX_VERSION_CODE', '5'),
 
     // iOS APP MINIMUM VERSION ALLOWED
     'iosminvc' => env('IOS_MIN_ALLOWED_VERSION_CODE', '1'),
