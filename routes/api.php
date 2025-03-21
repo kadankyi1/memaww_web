@@ -23,10 +23,10 @@ Route::middleware('auth:api')->post('/v1/user/request-collection-callback', [App
 Route::middleware('auth:api')->post('/v1/user/get-my-orders', [App\Http\Controllers\version1\UserController::class, 'getMyOrdersListing']);
 
 // SEND MESSAGE
-Route::middleware('auth:api')->post('/v1/user/send-message', [App\Http\Controllers\version1\UserController::class, 'sendMessage']);
+//Route::middleware('auth:api')->post('/v1/user/send-message', [App\Http\Controllers\version1\UserController::class, 'sendMessage']);
 
 // GET MY MESSAGES
-Route::middleware('auth:api')->post('/v1/user/get-my-messages', [App\Http\Controllers\version1\UserController::class, 'getMyMessages']);
+//Route::middleware('auth:api')->post('/v1/user/get-my-messages', [App\Http\Controllers\version1\UserController::class, 'getMyMessages']);
 
 // UPDATE ORDER PAYMENT
 Route::middleware('auth:api')->post('/v1/user/update-order-payment', [App\Http\Controllers\version1\UserController::class, 'updateOrderPaymentStatus']);
